@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useState, useContext, useEffect, useRef, useLayoutEffect } from "react";
 import { type ReactNode } from "react";
-import api from "../lib/api";
+import api from "@/lib/api";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 

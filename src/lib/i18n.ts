@@ -1,20 +1,16 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import HttpBackend from 'i18next-http-backend';
+import fr from '@/locales/fr/translation.json';
+import ar from '@/locales/ar/translation.json';
 
-i18n
-  .use(HttpBackend)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'fr',
-    debug: true,
-    interpolation: {
-      escapeValue: false, // react already escapes
-    },
-    backend: {
-      // loadPath: '../locales/{{lng}}/translation.json',
-      loadPath:'../locales/{{lng}}/translation.json',
-    },
-  });
+i18n.use(initReactI18next).init({
+  resources: {
+    fr: { translation: fr },
+    ar: { translation: ar },
+  },
+  fallbackLng: 'fr',
+  debug: false,
+  interpolation: { escapeValue: false },
+});
 
 export default i18n;
