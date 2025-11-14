@@ -1,0 +1,21 @@
+{
+    "login":{
+        "login": "Se connecter",
+        "email": "E-mail",
+        "password": "Mot de passe"
+    },
+    "common":{
+        "logout": "Se déconnecter",
+        "submit": "Soumettre",
+        "cancel": "Annuler",
+        "search": "Rechercher",
+        "change_language": "Changer de langue"
+    },
+    "welcome": "Bienvenue dans notre application",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "language": "Langue",
+    "home": "Accueil",
+    "about": "À propos",
+    "contact": "Contact"
+}
