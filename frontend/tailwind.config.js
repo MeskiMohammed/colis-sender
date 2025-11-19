@@ -9,6 +9,7 @@ export default {
     extend: {
       colors:{
         primary: colors.blue[800],
+        background: colors.blue[50],
       }
     },
   },

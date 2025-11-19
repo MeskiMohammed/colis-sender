@@ -18,6 +18,8 @@ export class AuthService {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return null;
 
-    return { user, token: this.jwt.sign({ id: user.id, email: user.email }) };
+    const {password:passwd,...obj} = user
+
+    return { user:obj, token: this.jwt.sign({ id: user.id, email: user.email }) };
   }
 }

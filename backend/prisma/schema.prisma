@@ -13,14 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model users {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
 }
 
-model Clients {
+model clients {
   id        Int      @id @default(autoincrement())
   name      String
   phone     String
@@ -30,4 +30,19 @@ model Clients {
   country   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model orders {
+  id        Int      @id @default(autoincrement())
+}
+
+model cities {
+  id        Int      @id @default(autoincrement())
+  name      String
+  country   Countries
+}
+
+enum Countries {
+  Maroc
+  France
 }

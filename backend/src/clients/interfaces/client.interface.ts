@@ -1,4 +1,4 @@
-export interface Clients {
+export interface Client {
     name: string
     phone: string
     city: string

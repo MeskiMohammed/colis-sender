@@ -4,8 +4,20 @@
         "email": "E-mail",
         "password": "Mot de passe"
     },
+    "sidebar":{
+        "maf": "Maroc à la France",
+        "fam": "France au Maroc",
+        "add": "Ajouter",
+        "list": "Liste",
+        "clients": "Clients",
+        "cities": "Villes"
+    },
+    "user":{
+        "profile": "Profil",
+        "settings": "Paramètres",
+        "logout": "Se déconnecter"
+    },
     "common":{
-        "logout": "Se déconnecter",
         "submit": "Soumettre",
         "cancel": "Annuler",
         "search": "Rechercher",

@@ -1,13 +1,20 @@
 import { Routes, Route } from 'react-router-dom';
 import Login from './pages/login';
+import Check from './pages/check';
+import Layout from './components/layout';
+import NotFound from './pages/notFound';
 
 function App() {
   return <Routes>
+    <Route path="/" element={<Check/>} />
     <Route path="/login" element={<Login/>} />
-    <Route path="/" element={<div>Home Page</div>} />
-    <Route path="/about" element={<div>About Page</div>} />
-    <Route path="/contact" element={<div>Contact Page</div>} />
-    <Route path="*" element={<div>404 Not Found</div>} />
+    <Route element={<Layout/>}>
+      <Route path="/add" element={<div>About Page</div>} />
+      <Route path="/list" element={<div>Contact Page</div>} />
+      <Route path="/clients" element={<div>Contact Page</div>} />
+      <Route path="/cities" element={<div>Contact Page</div>} />
+      <Route path="*" element={<NotFound/>} />
+    </Route>
   </Routes>
 }
 

@@ -5,15 +5,18 @@ import { AuthProvider } from "./providers/AuthProvider.tsx";
 import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
+import { CountryProvider } from "./providers/CountryProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <LanguageProvider>
-      <AuthProvider>
-        <Router>
-          <App />
-        </Router>
-      </AuthProvider>
+      <Router>
+        <AuthProvider>
+          <CountryProvider>
+            <App />
+          </CountryProvider>
+        </AuthProvider>
+      </Router>
     </LanguageProvider>
   </StrictMode>
 );

@@ -15,13 +15,12 @@ export default function Login() {
   async function handleLogin() {
 		setLoading(true);
     try {
-      // const res = await axios.post("/auth/login", form);
-			// setUser(res.data.user);
-			// setToken(res.data.token);
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await axios.post(import.meta.env.VITE_PUBLIC_API_URL +"/login", form);
+			setUser(res.data.user);
+			setToken(res.data.token);
 			navigate('/dashboard');
     } catch (err) {
-      console.log(err);
+      alert(JSON.stringify(err));
     }finally{
 			setLoading(false);
 		}
@@ -55,7 +54,7 @@ export default function Login() {
             />
           </div>
           <div className="flex justify-end">
-            <Button onClick={() => {}}>{t("login.login")}</Button>
+            <Button onClick={handleLogin} disabled={loading} >{t("login.login")}</Button>
           </div>
         </div>
       </div>

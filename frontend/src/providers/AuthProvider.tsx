@@ -52,7 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
-    alert('auth provider initialized')
     tokenRef.current = token;
   }, [token]);
 
