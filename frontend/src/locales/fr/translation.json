@@ -23,6 +23,10 @@
         "search": "Rechercher",
         "change_language": "Changer de langue"
     },
+    "city":{
+        "add":"Ajouter",
+        "add_city": "Ajouter une ville"
+    },
     "welcome": "Bienvenue dans notre application",
     "settings": "Paramètres",
     "profile": "Profil",

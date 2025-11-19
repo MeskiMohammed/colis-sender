@@ -6,10 +6,12 @@ export default function Layout() {
   return (
     <>
       <Sidebar />
-      <main className="absolute inset-0 bg-background overflow-hidden">
+      <div className="absolute flex flex-col inset-0 bg-background overflow-hidden">
         <Navbar/>
-        <Outlet />
-      </main>
+        <main className="flex-1 p-8 overflow-auto">
+          <Outlet />
+        </main>
+      </div>
     </>
   );
 }

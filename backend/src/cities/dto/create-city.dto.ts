@@ -1,4 +1,13 @@
+import { Countries } from "@prisma/client"
+import { Type } from "class-transformer"
+import { IsString } from "class-validator"
+
 export class CreateCityDto {
+    @IsString()
+    @Type(() => String)
     name: string
-    country: string
+
+    @IsString()
+    @Type(() => String)
+    country: Countries
 }

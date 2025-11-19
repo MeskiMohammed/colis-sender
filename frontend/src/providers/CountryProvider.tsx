@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useState } from 'react';
 
 type CountryContextType = {
-  country: string;
-  setCountry: (country: 'morocco' | 'france') => void;
+  country: Country;
+  setCountry: (country: Country) => void;
 };
+type Country = 'Morocco' | 'France'
 
 const CountryContext = createContext({} as CountryContextType);
 
 export const CountryProvider = ({ children }:{children: React.ReactNode}) => {
-  const [country, setCountry] = useState<'morocco' | 'france'>('morocco');
+  const [country, setCountry] = useState<Country>('Morocco');
 
   return (
     <CountryContext.Provider value={{ country, setCountry }}>

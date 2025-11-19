@@ -26,10 +26,10 @@ export default function Sidebar() {
 			<br />
 			<div className="relative grid grid-cols-2 p-1 bg-white rounded">
 				<div className="absolute p-1 h-full w-full">
-					<div data-country={country} className="bg-primary h-full rounded w-1/2 translate-x-[100%] data-[country=morocco]:translate-x-0 transition-transform duration-300" />
+					<div data-country={country} className="bg-primary h-full rounded w-1/2 translate-x-[100%] data-[country=Morocco]:translate-x-0 transition-transform duration-300" />
 				</div>
-				<div data-country={country} className="rounded relative text-black data-[country=morocco]:text-white z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={()=>setCountry('morocco')}>{t('sidebar.maf')}</div>
-				<div data-country={country} className="rounded relative text-black data-[country=france]:text-white  z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={()=>setCountry('france')}>{t('sidebar.fam')}</div>
+				<div data-country={country} className="rounded relative text-black data-[country=Morocco]:text-white z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={()=>setCountry('Morocco')}>{t('sidebar.maf')}</div>
+				<div data-country={country} className="rounded relative text-black data-[country=France]:text-white  z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={()=>setCountry('France')}>{t('sidebar.fam')}</div>
 			</div>
       <ul className="flex flex-col items-center text-2xl gap-6 py-8">
         <li><Link to='/add'>{t('sidebar.add')}</Link></li>

@@ -20,7 +20,7 @@ async function main() {
 
   if (moroccoCities.length > 0) {
     await prisma.cities.createMany({
-      data: moroccoCities.map((name) => ({ name, country: 'Maroc' })),
+      data: moroccoCities.map((name) => ({ name, country: 'Morocco' })),
       skipDuplicates: true,
     });
   }
