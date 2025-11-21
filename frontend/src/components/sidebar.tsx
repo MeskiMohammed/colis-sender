@@ -8,6 +8,13 @@ export default function Sidebar() {
   const { country, setCountry } = useCountry();
   const sidebarRef = useRef<HTMLElement>(document.getElementById("sidebar"));
 
+  const links: [string, string][] = [
+    ["/add", t("sidebar.add")],
+    ["/list", t("sidebar.list")],
+    ["/clients", t("sidebar.clients")],
+    ["/cities", t("sidebar.cities")],
+  ];
+
   useEffect(() => {
     sidebarRef.current = document.getElementById("sidebar");
   }, []);
@@ -36,26 +43,13 @@ export default function Sidebar() {
         </div>
       </div>
       <ul className="flex flex-col items-center text-2xl gap-6 py-8">
-        <li>
-          <Link onClick={closeSidebar} to="/add">
-            {t("sidebar.add")}
-          </Link>
-        </li>
-        <li>
-          <Link onClick={closeSidebar} to="/list">
-            {t("sidebar.list")}
-          </Link>
-        </li>
-        <li>
-          <Link onClick={closeSidebar} to="/clients">
-            {t("sidebar.clients")}
-          </Link>
-        </li>
-        <li>
-          <Link onClick={closeSidebar} to="/cities">
-            {t("sidebar.cities")}
-          </Link>
-        </li>
+        {links.map((link: [string, string]) => (
+          <li key={link[0]}>
+            <Link onClick={closeSidebar} to={link[0]}>
+              {link[1]}
+            </Link>
+          </li>
+        ))}
       </ul>
     </aside>
   );

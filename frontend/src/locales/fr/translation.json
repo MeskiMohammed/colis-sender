@@ -1,78 +1,79 @@
 {
-    "login":{
-        "login": "Se connecter",
-        "email": "E-mail",
-        "password": "Mot de passe",
+  "login": {
+    "login": "Se connecter",
+    "email": "E-mail",
+    "password": "Mot de passe",
 
-        "email_empty": "Veuillez entrer votre e-mail",
-        "password_empty": "Veuillez entrer votre mot de passe",
+    "email_empty": "Veuillez entrer votre e-mail",
+    "password_empty": "Veuillez entrer votre mot de passe",
 
-        "email_error": "E-mail invalide",
-        "password_error": "Mot de passe invalide",
+    "email_error": "E-mail invalide",
+    "password_error": "Mot de passe invalide",
 
-        "logging_in": "Connexion en cours...",
-        "logged_in": "Connecté",
-        "login_error": "Erreur de connexion"
-    },
-    "sidebar":{
-        "maf": "Maroc à la France",
-        "fam": "France au Maroc",
-        "add": "Ajouter",
-        "list": "Liste",
-        "clients": "Clients",
-        "cities": "Villes"
-    },
-    "user":{
-        "profile": "Profil",
-        "settings": "Paramètres",
-        "logout": "Se déconnecter"
-    },
-    "common":{
-        "change_language": "Changer de langue",
-        
-        "cancel": "Annuler",
-        "search": "Rechercher",
-
-        "country":"Pays",
-        
-        "add":"Ajouter",
-        "save":"Enregistrer",
-        "delete":"Supprimer",
-
-        "error":"Erreur",
-        
-        "delete_confirm":"Êtes-vous sûr de vouloir supprimer cet élément ?",
-        
-        "adding":"Ajout en cours...",
-        "added":"Ajouté",
-        "add_error":"Erreur d'ajout",
-        
-        "saving":"Modification en cours...",
-        "saved":"Modifié",
-        "save_error":"Erreur de modification",
-
-        "deleting":"Suppression en cours...",
-        "deleted":"Supprimé",
-        "delete_error":"Erreur de suppression"
-    },
-    "city":{
-        "city": "Ville",
-        "add_city": "Ajouter une ville"
-    },
-    "client":{
-        "create": "Ajouter un client",
-        "edit": "Modifier un client",
-        "name":"nom",
-        "phone":"Téléphone",
-        "email":"E-mail",
-        "address":"Adresse",
-        "cin":"CIN"
-    },
-    "welcome": "Bienvenue dans notre application",
-    "settings": "Paramètres",
+    "logging_in": "Connexion en cours...",
+    "logged_in": "Connecté",
+    "login_error": "Erreur de connexion"
+  },
+  "sidebar": {
+    "maf": "Maroc à la France",
+    "fam": "France au Maroc",
+    "add": "Ajouter",
+    "list": "Liste",
+    "clients": "Clients",
+    "cities": "Villes"
+  },
+  "user": {
     "profile": "Profil",
-    "language": "Langue",
-    "home": "Accueil",
-    "about": "À propos",
-    "contact": "Contact"
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
+  },
+  "common": {
+    "no_internet": "Pas de connexion Internet",
+    "change_language": "Changer de langue",
+
+    "cancel": "Annuler",
+    "search": "Rechercher",
+
+    "country": "Pays",
+
+    "add": "Ajouter",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+
+    "error": "Erreur",
+
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+
+    "adding": "Ajout en cours...",
+    "added": "Ajouté",
+    "add_error": "Erreur d'ajout",
+
+    "saving": "Modification en cours...",
+    "saved": "Modifié",
+    "save_error": "Erreur de modification",
+
+    "deleting": "Suppression en cours...",
+    "deleted": "Supprimé",
+    "delete_error": "Erreur de suppression"
+  },
+  "city": {
+    "city": "Ville",
+    "add_city": "Ajouter une ville"
+  },
+  "client": {
+    "create": "Ajouter un client",
+    "edit": "Modifier un client",
+    "name": "nom",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "address": "Adresse",
+    "cin": "CIN"
+  },
+  "welcome": "Bienvenue dans notre application",
+  "settings": "Paramètres",
+  "profile": "Profil",
+  "language": "Langue",
+  "home": "Accueil",
+  "about": "À propos",
+  "contact": "Contact"
 }
