@@ -1,6 +1,7 @@
-import { City, Client } from "@prisma/client";
+import type City from "./city";
+import type Client from "./client";
 
-export class CreateOrderDto {
+export interface Order {
   parcelNumber: string;
   parcelCode: string;
   shipper: Client;
@@ -12,7 +13,7 @@ export class CreateOrderDto {
   date: Date;
   productType: string;
   weight: number;
-  statut: 'origin' | 'inTransit' | 'inStock' | 'delivered' | 'notDelivered';
+  statut: "origin" | "inTransit" | "inStock" | "delivered" | "notDelivered";
   payedAmount: number;
   NParcels: number;
   pics: string[];

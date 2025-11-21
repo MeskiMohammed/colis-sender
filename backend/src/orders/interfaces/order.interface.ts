@@ -1,26 +1,20 @@
-import { Client } from "../../clients/interfaces/client.interface";
-import { Parcel } from "../../parcels/interfaces/parcel.interface";
-import { Shipper } from "../../shippers/interfaces/shipper.interface";
-
+import { City, Client } from "@prisma/client";
 
 export interface Order {
-orderNumber: string;
-orderCode: string;
+parcelNumber: string;
+parcelCode: string;
+shipper: Client;
+recipientName:string
+recipientCity:City
+recipientNum:string
+recipientCin:string
+HomeDelivery: boolean;
 date:Date
+productType: string;
 weight: number;
 statut : "origin" | "inTransit" | "inStock" | "delivered" | "notDelivered"
-amount: number;
-type: string;
+payedAmount: number;
+NParcels:number;
+pics:string[];
 payed: boolean;
-HomeDelivery: boolean;
-shipper: Shipper;
-client: Client;
-parcel:Parcel
-
-// -------------> Option livraison à domicile
-// En origine | En route | En stock | Livré | Non livré
-// CIN expéditeur / destinataire
-// Nombre de colis
-// Photos du colis
-// Type de produit
 }

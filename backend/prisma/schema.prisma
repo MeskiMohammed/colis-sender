@@ -24,27 +24,64 @@ model Client {
   id        Int      @id @default(autoincrement())
   name      String
   phone     String
-  city      City   @relation(fields: [cityId], references: [id])
+  city      City     @relation(fields: [cityId], references: [id])
   cityId    Int
   address   String
   cin       String
   country   Country
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
 }
 
 model Order {
-  id Int @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
+  parcelNumber    String
+  parcelCode      String
+  sipperId        Int
+  shipper         Client   @relation(fields: [sipperId], references: [id])
+  recipientName   String
+  recipientCityId Int
+  recipientCity   City     @relation(fields: [recipientCityId], references: [id])
+  recipientNum    String
+  recipientCin    String
+  HomeDelivery    Boolean
+  date            DateTime
+  productType     String
+  weight          Float
+  statut          Status
+  payedAmount     Float
+  NParcels        Int
+  pics            Pic[]
+  payed           Boolean
+  clientId        Int
+  cityId          Int
+}
+
+model Pic {
+  id      Int      @id @default(autoincrement())
+  url     String
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId Int
 }
 
 model City {
-  id      Int       @id @default(autoincrement())
+  id      Int      @id @default(autoincrement())
   name    String
   clients Client[]
   country Country
+  orders  Order[]
 }
 
 enum Country {
   Morocco
   France
+}
+
+enum Status {
+  origin
+  inTransit
+  inStock
+  delivered
+  notDelivered
 }

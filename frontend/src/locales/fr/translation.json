@@ -34,6 +34,8 @@
     "cancel": "Annuler",
     "search": "Rechercher",
 
+    "print": "Imprimer",
+
     "country": "Pays",
 
     "add": "Ajouter",
@@ -68,6 +70,9 @@
     "email": "E-mail",
     "address": "Adresse",
     "cin": "CIN"
+  },
+  "list":{
+    "all_cities": "Toutes les villes"
   },
   "welcome": "Bienvenue dans notre application",
   "settings": "Paramètres",

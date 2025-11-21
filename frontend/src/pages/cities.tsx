@@ -6,7 +6,6 @@ import Button from "@/components/ui/button";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import type City from "@/types/city";
-import clsx from "clsx";
 import DeleteModal from "@/components/deleteModal";
 
 export default function Cities() {
