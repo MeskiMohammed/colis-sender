@@ -16,17 +16,8 @@ export type User = {
   firstName: string;
   lastName: string;
   email: string;
-  role: {
-    id: number;
-    name: string;
-  };
-  status: {
-    id: number;
-    name: string;
-  };
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
 };
 
 type AuthContextType = {
@@ -84,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             navigate('/login');
           }
         }
+        return Promise.reject(error);
       }
     );
 
@@ -106,12 +98,7 @@ export function useAuth() {
   return context;
 }
 
-/**
- * Hook to guard routes based on authentication status.
- * - If user is logged in AND accessing /auth/login, redirect to /dashboard
- * - If user is NOT logged in AND NOT on /auth/login, redirect to /auth/login
- * Returns { isLoading, isAuthenticated } for conditional rendering.
- */
+
 export function useRouteGuard() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -145,92 +132,12 @@ export function useRouteGuard() {
   return { isLoading, isAuthenticated: !!token };
 }
 
-/**
- * Component wrapper to protect routes with authentication guard.
- * Usage: Wrap your protected pages with <ProtectedRoute><YourPage /></ProtectedRoute>
- */
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isLoading } = useRouteGuard();
 
   // While checking auth and potentially redirecting, show nothing
   // This prevents flashing the page content before redirect
   if (isLoading) {
-    return null;
-  }
-
-  return <>{children}</>;
-}
-
-/**
- * Hook to guard routes based on role.
- * Redirects users with unauthorized roles to a forbidden page.
- *
- * @param allowedRoles - Array of role names allowed to access the page
- * @param forbiddenPath - Path to redirect unauthorized users (default: /forbidden)
- * @returns { isLoading, hasAccess } for conditional rendering
- *
- * Usage:
- *   const { isLoading, hasAccess } = useRoleGuard(["admin", "manager"]);
- */
-export function useRoleGuard(allowedRoles: string[],forbiddenPath: string = "/forbidden") {
-  const { token, user } = useAuth();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // No token means user is not authenticated; let useRouteGuard handle redirect to login
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
-    // Check if user's role is in the allowed roles
-    const userRole = user?.role?.name;
-    const isAllowed = userRole && allowedRoles.includes(userRole);
-
-    if (!isAllowed) {
-      // Redirect to forbidden page
-      navigate(forbiddenPath);
-      return;
-    }
-
-    // User has access, clear loading state
-    setIsLoading(false);
-  }, [token, user, allowedRoles, forbiddenPath, navigate]);
-
-  return {
-    isLoading,
-    hasAccess: !!token && allowedRoles.includes(user?.role?.name || ""),
-  };
-}
-
-/**
- * Component wrapper to protect routes with role-based access control.
- * Automatically combines authentication check + role check.
- * Redirects unauthorized roles to forbidden page.
- *
- * @param allowedRoles - Array of role names allowed to access the page
- * @param forbiddenPath - Path to redirect unauthorized users (default: /forbidden)
- *
- * Usage:
- *   <RoleProtectedRoute allowedRoles={["admin", "manager"]}>
- *     <AdminPanel />
- *   </RoleProtectedRoute>
- */
-export function RoleProtectedRoute({
-  children,
-  allowedRoles,
-  forbiddenPath = "/forbidden",
-}: {
-  children: ReactNode;
-  allowedRoles: string[];
-  forbiddenPath?: string;
-}) {
-  const { isLoading: authLoading } = useRouteGuard(); // Ensure user is logged in
-  const { isLoading: roleLoading } = useRoleGuard(allowedRoles, forbiddenPath); // Ensure user has role
-
-  // While checking auth and role, show nothing
-  if (authLoading || roleLoading) {
     return null;
   }
 

@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Post, Body, Param } from '@nestjs/common';
 import { CitiesService } from './cities.service';
-import { Countries } from '@prisma/client';
+import { Country } from '@prisma/client';
 import { CreateCityDto } from './dto/create-city.dto';
 
 @Controller('cities')
@@ -13,7 +13,7 @@ export class CitiesController {
     }
 
     @Get(':country')
-    findByCountry(@Param('country') country: Countries) {
+    findByCountry(@Param('country') country: Country) {
         return this.citiesService.findByCountry(country);
     }
 

@@ -3,15 +3,16 @@ import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { Country } from '@prisma/client';
 
 @UseGuards(AuthGuard)
 @Controller('clients')
 export class ClientsController {
     constructor(private readonly clientsService: ClientsService) {}
 
-    @Get()
-    async findAll() {
-        return this.clientsService.findAll();
+    @Get(':country')
+    async findAllCountry(@Param('country') country: Country) {
+        return this.clientsService.findAllCountry(country);
     }
 
     @Get(':id')

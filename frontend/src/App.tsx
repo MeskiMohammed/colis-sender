@@ -4,6 +4,7 @@ import Check from './pages/check';
 import Layout from './components/layout';
 import NotFound from './pages/notFound';
 import Cities from './pages/cities';
+import Clients from './pages/clients';
 
 function App() {
   return <Routes>
@@ -12,7 +13,7 @@ function App() {
     <Route element={<Layout/>}>
       <Route path="/add" element={<div>About Page</div>} />
       <Route path="/list" element={<div>Contact Page</div>} />
-      <Route path="/clients" element={<div>Contact Page</div>} />
+      <Route path="/clients" element={<Clients/>} />
       <Route path="/cities" element={<Cities/>} />
       <Route path="*" element={<NotFound/>} />
     </Route>

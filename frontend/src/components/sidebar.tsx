@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 export default function Sidebar() {
-	const {country, setCountry} = useCountry();
+  const { country, setCountry } = useCountry();
   const sidebarRef = useRef<HTMLElement>(document.getElementById("sidebar"));
 
   useEffect(() => {
@@ -23,26 +23,46 @@ export default function Sidebar() {
       <div className="flex justify-end" onClick={closeSidebar}>
         <X />
       </div>
-			<br />
-			<div className="relative grid grid-cols-2 p-1 bg-white rounded">
-				<div className="absolute p-1 h-full w-full">
-					<div data-country={country} className="bg-primary h-full rounded w-1/2 translate-x-[100%] data-[country=Morocco]:translate-x-0 transition-transform duration-300" />
-				</div>
-				<div data-country={country} className="rounded relative text-black data-[country=Morocco]:text-white z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={()=>setCountry('Morocco')}>{t('sidebar.maf')}</div>
-				<div data-country={country} className="rounded relative text-black data-[country=France]:text-white  z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={()=>setCountry('France')}>{t('sidebar.fam')}</div>
-			</div>
+      <br />
+      <div className="relative grid grid-cols-2 p-1 bg-white rounded">
+        <div className="absolute p-1 h-full w-full">
+          <div data-country={country} className="bg-primary h-full rounded w-1/2 translate-x-[100%] data-[country=Morocco]:translate-x-0 transition-transform duration-300" />
+        </div>
+        <div data-country={country} className="rounded relative text-black data-[country=Morocco]:text-white z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={() => setCountry("Morocco")}>
+          {t("sidebar.maf")}
+        </div>
+        <div data-country={country} className="rounded relative text-black data-[country=France]:text-white  z-10 py-2 px-4 text-center text-sm transition-color duration-300" onClick={() => setCountry("France")}>
+          {t("sidebar.fam")}
+        </div>
+      </div>
       <ul className="flex flex-col items-center text-2xl gap-6 py-8">
-        <li><Link to='/add'>{t('sidebar.add')}</Link></li>
-        <li><Link to='/list'>{t('sidebar.list')}</Link></li>
-        <li><Link to='/clients'>{t('sidebar.clients')}</Link></li>
-        <li><Link to='/cities'>{t('sidebar.cities')}</Link></li>
+        <li>
+          <Link onClick={closeSidebar} to="/add">
+            {t("sidebar.add")}
+          </Link>
+        </li>
+        <li>
+          <Link onClick={closeSidebar} to="/list">
+            {t("sidebar.list")}
+          </Link>
+        </li>
+        <li>
+          <Link onClick={closeSidebar} to="/clients">
+            {t("sidebar.clients")}
+          </Link>
+        </li>
+        <li>
+          <Link onClick={closeSidebar} to="/cities">
+            {t("sidebar.cities")}
+          </Link>
+        </li>
       </ul>
     </aside>
   );
 }
 
 export function SidebarTrigger() {
-	const sidebarRef = useRef<HTMLElement>(document.getElementById("sidebar"));
+  const sidebarRef = useRef<HTMLElement>(document.getElementById("sidebar"));
 
   useEffect(() => {
     sidebarRef.current = document.getElementById("sidebar");
@@ -53,7 +73,9 @@ export function SidebarTrigger() {
       sidebarRef.current.dataset.active = "true";
     }
   }
-  return <button onClick={openSidebar}>
-		<Menu />
-	</button>;
+  return (
+    <button onClick={openSidebar}>
+      <Menu />
+    </button>
+  );
 }

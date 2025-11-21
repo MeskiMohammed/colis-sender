@@ -6,6 +6,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
 import { CountryProvider } from "./providers/CountryProvider.tsx";
+import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
         <AuthProvider>
           <CountryProvider>
             <App />
+            <Toaster/>
           </CountryProvider>
         </AuthProvider>
       </Router>

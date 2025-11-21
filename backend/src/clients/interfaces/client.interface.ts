@@ -1,8 +1,10 @@
+import { City } from "../../cities/interfaces/city.interface"
+
 export interface Client {
     name: string
     phone: string
-    city: string
+    city: City
     address: string
     cin: string
-    country: string
+    country: 'Morocco' | 'France'
 }

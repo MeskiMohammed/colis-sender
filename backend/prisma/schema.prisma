@@ -13,36 +13,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
 }
 
-model clients {
+model Client {
   id        Int      @id @default(autoincrement())
   name      String
   phone     String
-  city      String
+  city      City   @relation(fields: [cityId], references: [id])
+  cityId    Int
   address   String
   cin       String
-  country   String
+  country   Country
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model orders {
-  id        Int      @id @default(autoincrement())
+model Order {
+  id Int @id @default(autoincrement())
 }
 
-model cities {
-  id        Int      @id @default(autoincrement())
-  name      String
-  country   Countries
+model City {
+  id      Int       @id @default(autoincrement())
+  name    String
+  clients Client[]
+  country Country
 }
 
-enum Countries {
+enum Country {
   Morocco
   France
 }

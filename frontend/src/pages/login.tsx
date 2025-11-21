@@ -5,25 +5,38 @@ import Button from "@/components/ui/button";
 import axios from "axios";
 import { useAuth } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
-	const [loading, setLoading] = useState<boolean>(false);
-	const {setUser, setToken} = useAuth();
-	const navigate = useNavigate();
-
+  const [error, setError] = useState<{email:boolean,password:boolean}>({email:false,password:false});
+  const { setUser, setToken } = useAuth();
+  const navigate = useNavigate();
 
   async function handleLogin() {
-		setLoading(true);
-    try {
-      const res = await axios.post(import.meta.env.VITE_PUBLIC_API_URL +"/login", form);
-			setUser(res.data.user);
-			setToken(res.data.token);
-			navigate('/dashboard');
-    } catch (err) {
-      alert(JSON.stringify(err));
-    }finally{
-			setLoading(false);
-		}
+    if(!form.email || !form.password){
+      if(!form.email) {
+        setError({...error,email:true})
+        toast.error(t("login.email_empty"),{id:"email"});
+      };
+      if(!form.password) {
+        setError({...error,password:true})
+        toast.error(t("login.password_empty"),{id:"password"});
+      };
+      return
+    }
+    try{
+      const res = await toast.promise(axios.post(import.meta.env.VITE_PUBLIC_API_URL + "/login", form), {
+        loading: t("login.logging_in"),
+        success: t("login.logged_in"),
+        error: t("login.login_error"),
+      },{id:"login"});
+      setUser(res.data.user);
+      setToken(res.data.token);
+      setError({email:false,password:false});
+      navigate("/list");
+    }catch(err:any){
+      setError(err.response.data)
+    }
   }
 
   return (
@@ -36,25 +49,19 @@ export default function Login() {
           <h1 className="text-3xl text-center">{t("login.login")}</h1>
           <br />
           <div>
-            <label htmlFor="email">{t("login.email")}</label>
-            <Input
-              type="email"
-              value={form.email}
-							disabled={loading}
-              onChange={(val) => setForm({ ...form, email: val })}
-            />
+            <label htmlFor="email" className={error.email ? "text-red-600" : ""}>{t("login.email")}</label>
+            <Input type="email" className={error.email ? "border-2 border-red-600 text-red-600" : ""} value={form.email} onChange={(e: any) => {setForm({ ...form, email: e.target.value });setError({...error,email:false})}} />
+            <p className="text-red-600 text-sm h-4">{error?.email ? t("login.email_error") : ""}</p>
           </div>
           <div>
-            <label htmlFor="password">{t("login.password")}</label>
-            <Input
-              type="password"
-              value={form.password}
-							disabled={loading}
-              onChange={(val) => setForm({ ...form, password: val })}
-            />
+            <label htmlFor="password" className={error.password ? "text-red-600" : ""}>{t("login.password")}</label>
+            <Input type="password" className={error.password ? "border-2 border-red-600 text-red-600" : ""} value={form.password} onChange={(e: any) => {setForm({ ...form, password: e.target.value });setError({...error,password:false})} } />
+            <p className="text-red-600 text-sm h-4">{error?.password ? t("login.password_error") : ""}</p>
           </div>
           <div className="flex justify-end">
-            <Button onClick={handleLogin} disabled={loading} >{t("login.login")}</Button>
+            <Button onClick={handleLogin}>
+              {t("login.login")}
+            </Button>
           </div>
         </div>
       </div>

@@ -1,11 +1,14 @@
-export default function Input({ value,type="text",disabled, onChange }: { value: string;type?:string;disabled:boolean; onChange: (val: string) => void }) {
+import clsx from "clsx";
+
+export default function Input(props:any) {
   return (
     <input
-      type={type}
-      value={value}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
-      className="border border-gray-300 w-full rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      type={props.type}
+      value={props.value}
+      disabled={props.disabled}
+      // forward the native event to the caller so handlers can read e.target.value
+      onChange={(e) => props.onChange && props.onChange(e)}
+      className={clsx("border border-gray-300 focus:border-black w-full rounded px-3 py-2 focus:outline-none", props.className)}
     />
   );
 }

@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.users.upsert({
+  await prisma.user.upsert({
     where: { email: 'admin@example.com' },
     update: {},
     create: {
@@ -19,14 +19,14 @@ async function main() {
   const franceCities: string[] = ['Canne', 'Canne la bocca', 'Dariginyne', 'Farigoge', 'Maresiliya', 'Mounto', 'Nice', 'Ountibe', 'Sate Maksine', 'Vantimilya'];
 
   if (moroccoCities.length > 0) {
-    await prisma.cities.createMany({
+    await prisma.city.createMany({
       data: moroccoCities.map((name) => ({ name, country: 'Morocco' })),
       skipDuplicates: true,
     });
   }
 
   if (franceCities.length > 0) {
-    await prisma.cities.createMany({
+    await prisma.city.createMany({
       data: franceCities.map((name) => ({ name, country: 'France' })),
       skipDuplicates: true,
     });
