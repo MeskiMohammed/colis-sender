@@ -8,7 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:5173','http://100.126.19.92:5173'],
+    origin: "*",
+    // origin: ['http://localhost:5173','http://100.126.19.92:5173'],
   });
   
   app.useGlobalPipes(new ValidationPipe({
@@ -21,6 +22,6 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000,'0.0.0.0');
 }
 bootstrap();

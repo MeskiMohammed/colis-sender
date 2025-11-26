@@ -1,20 +1,56 @@
-import { City, Client } from "@prisma/client";
+import { Type } from "class-transformer";
+import { IsBoolean, IsNumber, IsString } from "class-validator";
 
 export class CreateOrderDto {
+  @IsString()
+  @Type(()=>String)
   parcelNumber: string;
-  parcelCode: string;
-  shipper: Client;
+
+  @IsNumber()
+  @Type(()=>Number)
+  shipperId: number;
+
+  @IsString()
+  @Type(()=>String)
   recipientName: string;
-  recipientCity: City;
-  recipientNum: string;
+  
+  @IsString()
+  @Type(()=>String)
   recipientCin: string;
-  HomeDelivery: boolean;
-  date: Date;
+
+  @IsBoolean()
+  @Type(()=>Boolean)
+  homeDelivery: boolean;
+  
+  @IsNumber()
+  @Type(()=>Number)
+  recipientCityId: number;
+  
+  @IsString()
+  @Type(()=>String)
+  recipientPhone: string;
+  
+  @IsString()
+  @Type(()=>String)
+  recipientPhoneCode: string;
+
+  @IsBoolean()
+  @Type(()=>Boolean)
+  paid: boolean;
+  
+  @IsNumber()
+  @Type(()=>Number)
+  paidAmount: number;
+  
+  @IsNumber()
+  @Type(()=>Number)
+  nParcels: number;
+  
+  @IsString()
+  @Type(()=>String)
   productType: string;
+  
+  @IsNumber()
+  @Type(()=>Number)
   weight: number;
-  statut: 'origin' | 'inTransit' | 'inStock' | 'delivered' | 'notDelivered';
-  payedAmount: number;
-  NParcels: number;
-  pics: string[];
-  payed: boolean;
 }

@@ -6,25 +6,39 @@ import { Country } from '@prisma/client';
 
 @Injectable()
 export class ClientsService {
-    constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
-    async findAllCountry(country : Country) {
-        return this.prisma.client.findMany({where: { country }, include: { city: true } });
-    }
+  async findAll(country: Country) {
+    return this.prisma.client.findMany({
+      select: {
+				id: true,
+        name: true,
+        cin: true,
+        phoneCode: true,
+        phone: true,
+        address: true,
+        city: { select: { name: true } },
+      },
+      where: { country },
+    });
+  }
 
-    async findOne(id: number) {
-        return this.prisma.client.findUnique({ where: { id },include: { city: true } });
-    }
+  async findOne(id: number) {
+    return this.prisma.client.findUnique({
+      where: { id },
+      include: { city: true },
+    });
+  }
 
-    async create(data: CreateClientDto) {
-        return this.prisma.client.create({ data });
-    }
+  async create(data: CreateClientDto) {
+    return this.prisma.client.create({ data });
+  }
 
-    async update(id: number, data: UpdateClientDto) {
-        return this.prisma.client.update({ where: { id }, data });
-    }
+  async update(id: number, data: UpdateClientDto) {
+    return this.prisma.client.update({ where: { id }, data });
+  }
 
-    async remove(id: number) {
-        return this.prisma.client.delete({ where: { id } });
-    }
+  async remove(id: number) {
+    return this.prisma.client.delete({ where: { id } });
+  }
 }

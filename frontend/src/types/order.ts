@@ -16,6 +16,6 @@ export interface Order {
   statut: "origin" | "inTransit" | "inStock" | "delivered" | "notDelivered";
   payedAmount: number;
   NParcels: number;
-  pics: string[];
+  pics: {id:number,url:string}[];
   payed: boolean;
 }

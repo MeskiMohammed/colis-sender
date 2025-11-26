@@ -10,9 +10,9 @@ import { Country } from '@prisma/client';
 export class ClientsController {
     constructor(private readonly clientsService: ClientsService) {}
 
-    @Get(':country')
+    @Get('country/:country')
     async findAllCountry(@Param('country') country: Country) {
-        return this.clientsService.findAllCountry(country);
+        return this.clientsService.findAll(country);
     }
 
     @Get(':id')

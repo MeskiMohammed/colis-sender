@@ -26,7 +26,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside data-active="false" id="sidebar" className="absolute p-8 z-10 inset-0 bg-blue-800 text-white font-semibold -translate-x-[100%] data-[active=true]:translate-x-0 transition-transform duration-300">
+    <aside data-active="false" id="sidebar" className="absolute p-4 z-10 inset-0 bg-blue-800 text-white font-semibold -translate-x-[100%] data-[active=true]:translate-x-0 transition-transform duration-300">
       <div className="flex justify-end" onClick={closeSidebar}>
         <X />
       </div>

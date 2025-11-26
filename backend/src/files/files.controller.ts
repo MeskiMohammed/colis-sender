@@ -41,14 +41,15 @@ export class FilesController {
     @Body('orderId') orderId: number,
   ) {
     try {
-      return await Promise.all(
+      await Promise.all(
         files.map((file) =>
-          this.filesService.create({
+          this.filesService.create(({
             url: '/uploads/' + file.filename,
-            orderId,
-          }),
+            orderId: Number(orderId),
+          })),
         ),
       );
+      return { message: 'Files uploaded successfully' };
     } catch (err) {
       throw new BadRequestException('Failed to save files');
     }

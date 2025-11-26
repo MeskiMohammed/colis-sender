@@ -5,11 +5,19 @@ import api from "@/lib/api";
 import { useCountry } from "@/providers/CountryProvider";
 import type City from "@/types/city";
 import type Client from "@/types/client";
+import axios from "axios";
 import clsx from "clsx";
 import { t } from "i18next";
 import { Pen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
+type Country = {
+  code: string;
+  name: string;
+  phone_code: string;
+  flag: string;
+};
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -21,7 +29,7 @@ export default function Clients() {
   const { country } = useCountry();
 
   async function fetchClients(country: "Morocco" | "France") {
-    const res = await api.get("/clients/" + country);
+    const res = await api.get("/clients/country/" + country);
     setClients(res.data);
   }
 
@@ -85,13 +93,14 @@ export default function Clients() {
     setOpen(false);
     setOpenDelete(false);
     setEditing(false);
-    setClient({} as Partial<Client>);
+    setClient({phoneCode: country === "Morocco" ? "+212" : "+33"} as Partial<Client>);
   }
 
   useEffect(() => {
     (async () => {
       await Promise.all([fetchClients(country), fetchCities(country)]);
     })();
+    setClient({phoneCode: country === "Morocco" ? "+212" : "+33"})
   }, [country]);
 
   return (
@@ -100,18 +109,16 @@ export default function Clients() {
         <Button onClick={() => setOpen(true)}>{t("client.create")}</Button>
       </div>
       <br />
-      <ul>
+      <ul className="space-y-2">
         {clients.map((client: Client) => (
-          <li className="flex bg-white rounded-xl">
+          <li className="flex bg-white rounded-xl border shadow-lg">
             <div className="grid grid-cols-3 flex-1 p-4">
               <span>{t("client.name")}:</span>
               <span className="col-span-2">{client.name}</span>
               <span>{t("client.phone")}:</span>
-              <span className="col-span-2">{client.phone}</span>
+              <span className="col-span-2">{client.phoneCode+" "+client.phone}</span>
               <span>{t("client.cin")}:</span>
               <span className="col-span-2">{client.cin}</span>
-              <span>{t("common.country")}:</span>
-              <span className="col-span-2">{client.country}</span>
               <span>{t("city.city")}:</span>
               <span className="col-span-2">{client.city.name}</span>
               <span>{t("client.address")}:</span>
@@ -146,10 +153,19 @@ type ModalProps = {
 
 function Modal({ editing, client, setClient, cities, open, close, save }: ModalProps) {
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [countries, setCountries] = useState<Country[]>([]);
+
 
   useEffect(() => {
     setOpenModal(open);
   }, [open]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await axios.get("https://country-api.drnyeinchan.com/v1/countries");
+      setCountries(res.data);
+    })();
+  }, []);
 
   function closeModal() {
     setOpenModal(false);
@@ -170,7 +186,20 @@ function Modal({ editing, client, setClient, cities, open, close, save }: ModalP
               </div>
               <div className="flex flex-col">
                 <label>{t("client.phone")}</label>
-                <Input type="text" value={client.phone} onChange={(e: any) => setClient({ ...client, phone: e.target.value })} />
+                <div className="flex border border-gray-300 rounded group flex-1 w-full">
+                  <select onChange={(e: any) => setClient({ ...client, phoneCode: e.target.value })} className="w-14 bg-white px-2 focus:outline-none" value={client.phoneCode}>
+                    {countries.map((country, idx: number) => {
+                      return (
+                        country.phone_code && (
+                          <option value={country.phone_code} key={idx}>
+                            {country.flag} {country.name} {country.phone_code}
+                          </option>
+                        )
+                      );
+                    })}
+                  </select>
+                  <input type="number" value={client.phone} onChange={(e: any) => setClient({ ...client, phone: e.target.value })} className="w-full h-10 focus:outline-none px-2 group-focus:border-black" />
+                </div>
               </div>
               <div className="flex flex-col">
                 <label>{t("city.city")}</label>

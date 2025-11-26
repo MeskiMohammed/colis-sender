@@ -21,45 +21,48 @@ model User {
 }
 
 model Client {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
-  phone     String
-  city      City     @relation(fields: [cityId], references: [id])
-  cityId    Int
-  address   String
   cin       String
+  phone     String
+  phoneCode String
+  address   String
+  city      City    @relation(fields: [cityId], references: [id])
+  cityId    Int
   country   Country
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   orders    Order[]
 }
 
 model Order {
-  id              Int      @id @default(autoincrement())
-  parcelNumber    String
-  parcelCode      String
-  sipperId        Int
-  shipper         Client   @relation(fields: [sipperId], references: [id])
-  recipientName   String
-  recipientCityId Int
-  recipientCity   City     @relation(fields: [recipientCityId], references: [id])
-  recipientNum    String
-  recipientCin    String
-  HomeDelivery    Boolean
-  date            DateTime
-  productType     String
-  weight          Float
-  statut          Status
-  payedAmount     Float
-  NParcels        Int
-  pics            Pic[]
-  payed           Boolean
-  clientId        Int
-  cityId          Int
+  id Int @id @default(autoincrement())
+
+  parcelNumber String
+  parcelCode   String @unique
+  shipperId    Int
+  shipper      Client @relation(fields: [shipperId], references: [id])
+
+  recipientName      String
+  recipientCin       String
+  homeDelivery       Boolean
+  recipientCityId    Int
+  recipientCity      City    @relation(fields: [recipientCityId], references: [id])
+  recipientPhone     String
+  recipientPhoneCode String
+
+  date        DateTime @default(now())
+  paid        Boolean
+  paidAmount  Float
+  nParcels    Int
+  pics        Pic[]
+  productType String
+  weight      Float
+  status      Status   @default(origin)
+
+  @@index([parcelCode])
 }
 
 model Pic {
-  id      Int      @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   url     String
   order   Order  @relation(fields: [orderId], references: [id])
   orderId Int

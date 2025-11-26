@@ -1,12 +1,15 @@
 import axios from "axios";
-import { t } from "i18next";
-import { Frown, Loader } from "lucide-react";
+// import { t } from "i18next";
+import { 
+  // Frown,
+   Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 export default function Check() {
   const [internet, setInternet] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
+  const [err, setErr] = useState("")
 
   useEffect(() => {
     (async () => {
@@ -14,6 +17,7 @@ export default function Check() {
         await axios.get(import.meta.env.VITE_PUBLIC_API_URL);
         setInternet(true);
       } catch (err) {
+        setErr(JSON.stringify(err))
         setInternet(false);
       } finally {
         setLoading(false);
@@ -24,17 +28,18 @@ export default function Check() {
   if (loading) {
     return <Loading />;
   } else if (!internet && !loading) {
-    return <NoInternet />;
+    return <NoInternet err={err} />;
   } else if (internet && !loading) {
     return <Navigate to="/login" />;
   }
 }
 
-function NoInternet() {
+function NoInternet({err}:{err: string}) {
   return (
     <div className="absolute inset-0 flex justify-center items-center flex-col bg-gray-700 text-white">
-      <Frown size={200} />
-      <p className="text-4xl font-semibold text-center">{t("common.no_internet")}</p>
+      <p>{err}</p>
+      {/* <Frown size={200} />
+      <p className="text-4xl font-semibold text-center">{t("common.no_internet")}</p> */}
     </div>
   );
 }

@@ -10,6 +10,10 @@ export class CreateClientDto {
     @Type(()=>String)
     phone: string
 
+    @IsString()
+    @Type(()=>String)
+    phoneCode: string
+
     @IsNumber()
     @Type(()=>Number)
     cityId: number

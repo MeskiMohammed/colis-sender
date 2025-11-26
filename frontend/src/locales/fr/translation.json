@@ -3,13 +3,10 @@
     "login": "Se connecter",
     "email": "E-mail",
     "password": "Mot de passe",
-
     "email_empty": "Veuillez entrer votre e-mail",
     "password_empty": "Veuillez entrer votre mot de passe",
-
     "email_error": "E-mail invalide",
     "password_error": "Mot de passe invalide",
-
     "logging_in": "Connexion en cours...",
     "logged_in": "Connecté",
     "login_error": "Erreur de connexion"
@@ -30,30 +27,23 @@
   "common": {
     "no_internet": "Pas de connexion Internet",
     "change_language": "Changer de langue",
-
+    "yes": "Oui",
+    "no": "Non",
     "cancel": "Annuler",
     "search": "Rechercher",
-
     "print": "Imprimer",
-
     "country": "Pays",
-
     "add": "Ajouter",
     "save": "Enregistrer",
     "delete": "Supprimer",
-
     "error": "Erreur",
-
     "delete_confirm": "Êtes-vous sûr de vouloir supprimer cet élément ?",
-
     "adding": "Ajout en cours...",
     "added": "Ajouté",
     "add_error": "Erreur d'ajout",
-
     "saving": "Modification en cours...",
     "saved": "Modifié",
     "save_error": "Erreur de modification",
-
     "deleting": "Suppression en cours...",
     "deleted": "Supprimé",
     "delete_error": "Erreur de suppression"
@@ -71,8 +61,68 @@
     "address": "Adresse",
     "cin": "CIN"
   },
-  "list":{
-    "all_cities": "Toutes les villes"
+  "list": {
+    "all_cities": "Toutes les villes",
+    "parcel_code": "Code de colis",
+    "home_delivery": "à domicile",
+    "paid": "Payé",
+    "unpaid": "Non payé",
+    "name": "Nom",
+    "city": "Ville",
+    "phone": "Téléphone",
+    "cin": "CIN",
+    "number_parcels": "Nombre de colis",
+    "weight": "Poids",
+    "paid_amount": "Montant payé",
+    "details": "Détails",
+    "product_type":"Type de produit",
+    "origin": "Origine",
+    "inTransit": "En transit",
+    "delivered": "Livré",
+    "inStock": "En stock",
+    "notDelivered": "Non livré",
+    "unknown": "Inconnu"
+  },
+  "add": {
+    "parcel_number": "Numero de Colis",
+    "name": "nom",
+    "phone": "Téléphone",
+    "city": "Ville",
+    "address": "Adresse",
+    "cin": "CIN",
+    "home_delivery": "Livraison à domicile",
+    "error_empty_fields": "Veuillez remplir tous les champs obligatoires",
+    "save": {
+      "adding_shipper": "Ajout de l'expéditeur...",
+      "added_shipper": "Expéditeur ajouté",
+      "add_shipper_error": "Erreur lors de l'ajout de l'expéditeur",
+      "adding_recipient": "Ajout du destinataire...",
+      "added_recipient": "Destinataire ajouté",
+      "add_recipient_error": "Erreur lors de l'ajout du destinataire",
+      "adding_parcel": "Ajout du colis...",
+      "added_parcel": "Colis ajouté",
+      "add_parcel_error": "Erreur lors de l'ajout du colis"
+    },
+    "shipper": {
+      "shipper": "Expéditeur",
+      "description": "informations sur l'expéditeur",
+      "select_shipper": "Sélectionnez un expéditeur"
+    },
+    "recipient": {
+      "recipient": "Destinataire",
+      "description": "informations sur le destinataire"
+    },
+    "parcel": {
+      "product_type": "Type de produit",
+      "parcel": "Colis",
+      "description": "informations sur la colis",
+      "paid": "Payé",
+      "paid_amount": "Montant payé",
+      "weight": "Poids",
+      "number_parcels": "Nombre de colis",
+      "pics": "Photos des colis",
+      "pics_warning": "Les fichiers qui ne sont pas des images ou dont la taille dépasse 5 Mo seront ignorés"
+    }
   },
   "welcome": "Bienvenue dans notre application",
   "settings": "Paramètres",
