@@ -6,10 +6,12 @@ import type City from "@/types/city";
 import type Client from "@/types/client";
 import axios from "axios";
 import clsx from "clsx";
-import { t } from "i18next";
 import { Eye, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Camera, CameraResultType } from "@capacitor/camera";
 
 export type Shipper = {
   id?: number;
@@ -47,9 +49,11 @@ type Country = {
   flag: string;
 };
 
+type Order = Recipient & Parcel & { id: number; pics: { url: string }[]; shipper: Shipper & { city: City }; recipientCity: City; status: string; parcelCode: string };
+
 export default function Add() {
   const { country } = useCountry();
-  const [shipper, setShipper] = useState<Shipper>({ name: "", cin: "", phone: "", phoneCode: "", cityId: undefined, country: "", address: "" });
+  const [shipper, setShipper] = useState<Shipper>({ name: "", cin: "", phone: "", phoneCode: "", cityId: undefined, country: country, address: "" });
   const [recipient, setRecipient] = useState<Recipient>({ recipientName: "", recipientCin: "", homeDelivery: true, recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: "" });
   const [parcel, setParcel] = useState<Parcel>({ parcelNumber: "", paid: false, paidAmount: 0, nParcels: 1, productType: "", weight: 0 });
   const [pics, setPics] = useState<File[]>([]);
@@ -58,6 +62,33 @@ export default function Add() {
   const [openClientsModal, setOpenClientsModal] = useState<boolean>(false);
   const [previews, setPreviews] = useState<string[]>([]);
   const [picIdx, setPicIdx] = useState<number | null>(null);
+  const { state: order }: { state: Order } = useLocation();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (order) {
+      setShipper(order.shipper);
+      setRecipient({
+        recipientName: order.recipientName,
+        recipientCin: order.recipientCin,
+        homeDelivery: order.homeDelivery,
+        recipientCityId: order.recipientCityId,
+        recipientPhone: order.recipientPhone,
+        recipientPhoneCode: order.recipientPhoneCode,
+      });
+      setParcel({
+        parcelNumber: order.parcelNumber,
+        paid: order.paid,
+        paidAmount: order.paidAmount,
+        nParcels: order.nParcels,
+        productType: order.productType,
+        weight: order.weight,
+      });
+      setPreviews(order.pics.map((pic) => import.meta.env.VITE_PUBLIC_API_URL + pic.url));
+      setPics([]);
+    }
+  }, []);
 
   async function handleSaveOrder() {
     if (!checkShipper() || !checkRecipient() || !checkParcel()) {
@@ -66,54 +97,59 @@ export default function Add() {
     }
     let id;
     if (shipper.id === undefined) {
-      const res = await toast.promise(
-        api.post("clients", shipper),
-        {
-          loading: t("add.save.adding_shipper"),
-          success: () => {
-            clearShipper();
-            return t("add.save.shipper_added");
-          },
-          error: t("add.save.error_adding_shipper"),
-        },
-        { id: "shipper" }
-      );
+      const res = await api.post("clients", shipper);
       id = res.data.id;
     } else {
       id = shipper.id;
     }
-    const res = await toast.promise(
-      api.post("/orders", { shipperId: id, ...recipient, ...parcel }),
-      {
-        loading: t("add.save.adding_order"),
-        success: () => {
-          clearRecipient();
-          clearParcel();
-          return t("add.save.order_added");
-        },
-        error: t("add.save.error_adding_order"),
-      },
-      { id: "order" }
-    );
 
-    await toast.promise(
-      handleSavePics(res.data.id),
-      {
-        loading: t("add.save.adding_pics"),
-        success: () => {
-          clearPics();
-          return t("add.save.pics_added");
+    if (order) {
+      const deletedPics = order.pics.filter((pic) => !previews.includes(import.meta.env.VITE_PUBLIC_API_URL + pic.url));
+
+      await Promise.all([
+        toast.promise(
+          api.put("/orders/" + order.id, { shipperId: id, ...recipient, ...parcel }),
+          {
+            loading: t("common.saving"),
+            success: () => {
+              clearShipper();
+              clearRecipient();
+              clearParcel();
+              return t("common.saved");
+            },
+            error: t("common.save_error"),
+          },
+          { id: "add_order" }
+        ),
+        await handleSavePics(order.id),
+        await handleDeletePics(deletedPics.map((pic: any) => pic.id)),
+      ]);
+      clearPics();
+    } else {
+      const res = await toast.promise(
+        api.post("/orders", { shipperId: id, ...recipient, ...parcel }),
+        {
+          loading: t("common.added"),
+          success: () => {
+            clearShipper();
+            clearRecipient();
+            clearParcel();
+            return t("common.adding");
+          },
+          error: t("common.add_error"),
         },
-        error: t("add.save.error_adding_pics"),
-      },
-      { id: "pics" }
-    );
+        { id: "add_order" }
+      );
+
+      await handleSavePics(res.data.id);
+      clearPics();
+    }
+    navigate("/list");
   }
 
   function checkShipper() {
     const keys: (keyof Shipper)[] = ["name", "cin", "phone", "phoneCode", "cityId", "country", "address"];
     for (const k of keys) {
-      console.log(shipper[k]);
       if (!shipper[k]) return false;
     }
     return true;
@@ -121,7 +157,6 @@ export default function Add() {
   function checkRecipient() {
     const keys: (keyof Recipient)[] = ["recipientName", "recipientCin", "recipientCityId", "recipientPhone", "recipientPhoneCode"];
     for (const k of keys) {
-      console.log(recipient[k]);
       if (!recipient[k]) return false;
     }
     return true;
@@ -129,17 +164,16 @@ export default function Add() {
   function checkParcel() {
     const keys: (keyof Parcel)[] = ["parcelNumber", "paidAmount", "nParcels", "productType", "weight"];
     for (const k of keys) {
-      console.log(parcel[k]);
       if (!parcel[k]) return false;
     }
     return true;
   }
 
   function clearShipper() {
-    setShipper({ name: "", cin: "", phone: "", phoneCode: country === "Morocco" ? "+212" : "+33", cityId: undefined, country: "", address: "" });
+    setShipper({ name: "", cin: "", phone: "", phoneCode: country === "Morocco" ? "+212" : "+33", cityId: undefined, country: country, address: "" });
   }
   function clearRecipient() {
-    setRecipient({ recipientName: "", recipientCin: "", homeDelivery: true, recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: "" });
+    setRecipient({ recipientName: "", recipientCin: "", homeDelivery: true, recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: country === "Morocco" ? "+33" : "+212" });
   }
   function clearParcel() {
     setParcel({ parcelNumber: "", paid: false, paidAmount: 0, nParcels: 1, productType: "", weight: 0 });
@@ -165,10 +199,14 @@ export default function Add() {
     });
   }
 
+  async function handleDeletePics(ids: number[]) {
+    await Promise.all(ids.map((id) => api.delete("/files/" + id)));
+  }
+
   useEffect(() => {
-    setShipper({ ...shipper, phoneCode: country === "Morocco" ? "+212" : "+33", country: country});
-    setRecipient({ ...recipient, recipientPhoneCode: country === "Morocco" ? "+33" : "+212" });
-    if(shipper.id !== undefined) clearShipper()
+    setShipper((prev) => ({ ...prev, phoneCode: country === "Morocco" ? "+212" : "+33", country: country }));
+    setRecipient((prev) => ({ ...prev, recipientPhoneCode: country === "Morocco" ? "+33" : "+212" }));
+    if (shipper.id !== undefined) clearShipper();
   }, [country]);
 
   useEffect(() => {
@@ -184,15 +222,42 @@ export default function Add() {
     setPreviews((prev) => prev.filter((_, idx) => idx !== id));
   }
 
-  function addPics(e: any) {
-    const files = Array.from((e.target.files as File[]) || []);
-    const allowedFiles = files.filter((file) => file.type.startsWith("image/") && file.size / 1024 / 1024 <= 5);
-    setPics((prev) => [...prev, ...allowedFiles.filter((file) => file.size / 1024 / 1024 <= 5)]);
+  // function addPics(e: any) {
+  //   const files = Array.from((e.target.files as File[]) || []);
+  //   const allowedFiles = files.filter((file) => file.type.startsWith("image/") && file.size / 1024 / 1024 <= 5);
+  //   setPics((prev) => [...prev, ...allowedFiles.filter((file) => file.size / 1024 / 1024 <= 5)]);
 
-    const urls = allowedFiles.map((file) => URL.createObjectURL(file));
-    setPreviews((prev) => [...prev, ...urls]);
+  //   const urls = allowedFiles.map((file) => URL.createObjectURL(file));
+  //   setPreviews((prev) => [...prev, ...urls]);
 
-    e.target.value = "";
+  //   e.target.value = "";
+  // }
+
+  function base64ToFile(base64: string, filename: string, mime: string): File {
+    const byteString = atob(base64);
+    const byteNumbers = new Array(byteString.length);
+
+    for (let i = 0; i < byteString.length; i++) {
+      byteNumbers[i] = byteString.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new File([byteArray], filename, { type: mime });
+  }
+
+  async function takePicture() {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      correctOrientation: true,
+      width: 600,
+      resultType: CameraResultType.Base64,
+    });
+
+    const file = base64ToFile(image.base64String!, `camera_${Date.now()}.jpeg`, `image/jpeg`);
+
+    setPics((prev) => [...prev, file]);
+
+    setPreviews((prev) => [...prev, URL.createObjectURL(file)]);
   }
 
   return (
@@ -228,8 +293,9 @@ export default function Add() {
           <div>
             <label className="text-sm text-gray-900">{t("add.city")}</label>
             <select disabled={shipper.id !== undefined} value={shipper.cityId} onChange={(e: any) => setShipper({ ...shipper, cityId: e.target.value })} className="w-full h-10 bg-white p-2 border border-gray-300 rounded disabled:opacity-100 disabled:!text-gray-500 disabled:bg-gray-100">
+              <option value={undefined}>{t("common.select_city")}</option>
               {cities[country]?.map((city: City) => (
-                <option key={city.id} value={city.id}>
+                <option key={"shipper_city" + city.id} value={city.id}>
                   {city.name}
                 </option>
               ))}
@@ -239,12 +305,12 @@ export default function Add() {
             <label className="text-sm text-gray-900">{t("add.phone")}</label>
             <div className="flex gap-2">
               <div data-disabled={shipper.id !== undefined} className="flex border border-gray-300 rounded group flex-1 w-[calc(100%-12*0.25rem)] data-[disabled=true]:text-gray-500 data-[disabled=true]:bg-gray-100">
-                <select disabled={shipper.id !== undefined} onChange={(e: any) => setShipper({ ...shipper, phoneCode: e.target.value })} className="w-14 bg-white px-2 focus:outline-none disabled:bg-gray-100" value={shipper.phoneCode}>
+                <select disabled={shipper.id !== undefined} onChange={(e: any) => setShipper({ ...shipper, phoneCode: e.target.value })} className="w-28 bg-white px-2 focus:outline-none disabled:bg-gray-100" value={shipper.phoneCode}>
                   {countries.map((country, idx: number) => {
                     return (
                       country.phone_code && (
-                        <option value={country.phone_code} key={idx}>
-                          {country.flag} {country.name} {country.phone_code}
+                        <option className="rtl:-translate-x-1/1" value={country.phone_code} key={"shipper_country" + idx}>
+                          {country.flag} {country.phone_code}
                         </option>
                       )
                     );
@@ -295,9 +361,10 @@ export default function Add() {
           </div>
           <div>
             <label className="text-sm text-gray-900">{t("add.city")}</label>
-            <select onChange={(e: any) => setRecipient({ ...recipient, recipientCityId: e.target.value })} className="w-full h-10 bg-white p-2 border border-gray-300 rounded">
+            <select value={recipient.recipientCityId} onChange={(e: any) => setRecipient({ ...recipient, recipientCityId: e.target.value })} className="w-full h-10 bg-white p-2 border border-gray-300 rounded">
+              <option value={undefined}>{t("common.select_city")}</option>
               {cities[country === "Morocco" ? "France" : "Morocco"]?.map((city: City) => (
-                <option key={city.id} value={city.id}>
+                <option key={"city" + city.id} value={city.id}>
                   {city.name}
                 </option>
               ))}
@@ -307,12 +374,12 @@ export default function Add() {
             <label className="text-sm text-gray-900">{t("add.phone")}</label>
             <div className="flex gap-2">
               <div className="flex border border-gray-300 rounded group flex-1 w-[calc(100%-12*0.25rem)]">
-                <select onChange={(e: any) => setRecipient({ ...recipient, recipientPhoneCode: e.target.value })} className="w-14 bg-white px-2 focus:outline-none" value={recipient.recipientPhoneCode}>
+                <select onChange={(e: any) => setRecipient({ ...recipient, recipientPhoneCode: e.target.value })} className="w-28 bg-white px-2 focus:outline-none" value={recipient.recipientPhoneCode}>
                   {countries.map((country, idx: number) => {
                     return (
                       country.phone_code && (
-                        <option value={country.phone_code} key={idx}>
-                          {country.flag} {country.name} {country.phone_code}
+                        <option value={country.phone_code} key={"country" + idx}>
+                          {country.flag} {country.phone_code}
                         </option>
                       )
                     );
@@ -379,8 +446,8 @@ export default function Add() {
             <p className="text-xs pb-1 text-orange-700">({t("add.parcel.pics_warning")})</p>
             <div className=" outline outline-gray-300 rounded aspect-video overflow-y-auto grid grid-cols-2 gap-2 overflow-x-hidden">
               {previews.map((preview: string, idx: number) => (
-                <div className="relative aspect-video flex justify-center items-center bg-gray-300 rounded" key={idx}>
-                  <img src={preview} key={idx} alt={`pic-${idx}`} className="rounded max-h-full" />
+                <div className="relative aspect-video flex justify-center items-center bg-gray-300 rounded" key={"pic-" + idx}>
+                  <img src={preview} alt={`pic-${idx}`} className="rounded max-h-full" />
                   <button className="absolute text-white top-0 right-0 p-2 bg-gray-600/30 rounded" onClick={() => deletePic(idx)}>
                     <X />
                   </button>
@@ -389,10 +456,13 @@ export default function Add() {
                   </button>
                 </div>
               ))}
-              <label htmlFor="pics" className={clsx("flex aspect-video flex-col justify-center items-center bg-gray-300 text-xs", previews.length > 0 ? "" : "col-span-2")}>
+              <div onClick={takePicture} className={clsx("flex aspect-video flex-col justify-center items-center bg-gray-300 text-xs", previews.length > 0 ? "" : "col-span-2")}>
                 Upload Pictures
-              </label>
-              <input className="hidden" type="file" id="pics" accept="image/*" multiple onChange={addPics} />
+              </div>
+              {/* <label htmlFor="pics" className={clsx("flex aspect-video flex-col justify-center items-center bg-gray-300 text-xs", previews.length > 0 ? "" : "col-span-2")}>
+                Upload Pictures
+              </label> */}
+              {/* <input className="hidden" type="file" id="pics" accept="image/*" multiple onChange={addPics} /> */}
             </div>
           </div>
         </div>
@@ -427,6 +497,7 @@ function ClientsModal({ open, setOpen, setShipper, country }: props) {
   const [clients, setClients] = useState<Client[]>([]);
   const [filtered, setFiltered] = useState<Client[]>([]);
   const [search, setSearch] = useState<string>("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchClients(country);
@@ -471,9 +542,9 @@ function ClientsModal({ open, setOpen, setShipper, country }: props) {
             <div className="space-y-2 px-4 overflow-x-hidden overflow-y-auto">
               {filtered.map((client: Client) => (
                 <div
-                  key={client.id}
+                  key={"client-" + client.id}
                   onClick={() => {
-                    setShipper({ ...client });
+                    setShipper({ ...client, country });
                     closeModal();
                   }}
                   className="p-4 w-full border rounded-lg shadow-lg"

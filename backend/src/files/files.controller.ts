@@ -2,15 +2,20 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
+  Param,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { FilesService } from './files.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
@@ -53,5 +58,11 @@ export class FilesController {
     } catch (err) {
       throw new BadRequestException('Failed to save files');
     }
+  }
+
+
+  @Delete(':id')
+  async deleteFile(@Param('id') id: number){
+    await this.filesService.remove(Number(id))
   }
 }

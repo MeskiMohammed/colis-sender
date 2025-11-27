@@ -2,14 +2,16 @@ import Button from "@/components/ui/button";
 import api from "@/lib/api";
 import { useCountry } from "@/providers/CountryProvider";
 import type City from "@/types/city";
-import { t } from "i18next";
-import { Info, Map, PackageSearch, Printer, Search, Trash2, User } from "lucide-react";
+import { Map, PackageSearch, Printer, Trash2, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Parcel, Recipient, Shipper } from "./add";
 import DeleteModal from "@/components/deleteModal";
 import toast from "react-hot-toast";
 import clsx from "clsx";
 import useEmblaCarousel from "embla-carousel-react";
+import { useNavigate } from "react-router-dom";
+import { printList, printElement } from "@/lib/pdf";
+import { useTranslation } from "react-i18next";
 
 type StrippedOrder = {
   id: number;
@@ -18,11 +20,13 @@ type StrippedOrder = {
   recipientCity: { id: number; name: string };
   recipientPhoneCode: string;
   recipientPhone: string;
-  shipper: { name: string; city: { name: string } };
+  shipper: { name: string; phone: string; phoneCode: string; city: { name: string } };
   status: string;
   productType: string;
   parcelNumber: string;
   date: string;
+  nParcels: number;
+  paid: boolean;
 };
 
 type Order = Recipient & Parcel & { id: number; pics: { url: string }[]; shipper: Shipper & { city: City }; recipientCity: City; status: string; parcelCode: string };
@@ -34,8 +38,11 @@ export default function List() {
   const [filtered, setFiltered] = useState<StrippedOrder[]>([]);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
   const [openDetailsModal, setOpenDetailsModal] = useState<boolean>(false);
+  const [openStatusModal, setOpenStatusModal] = useState<boolean>(false);
+  const [openStatusModalStatus, setOpenStatusModalStatus] = useState<string>("");
   const IdRef = useRef<number | null>(null);
   const { country } = useCountry();
+  const { t } = useTranslation();
 
   async function fetchCities(country: "Morocco" | "France") {
     const res = await api.get("/cities/" + (country === "Morocco" ? "France" : "Morocco"));
@@ -57,10 +64,18 @@ export default function List() {
     setOpenDetailsModal(true);
   }
 
+  function handleShowStatusModal(id: number, status: string) {
+    IdRef.current = id;
+    setOpenStatusModalStatus(status);
+    setOpenStatusModal(true);
+  }
+
   function closeModal() {
     IdRef.current = null;
+    setOpenStatusModalStatus("");
     setOpenDeleteModal(false);
     setOpenDetailsModal(false);
+    setOpenStatusModal(false);
   }
 
   function clearSearch() {
@@ -71,12 +86,14 @@ export default function List() {
     await toast.promise(
       api.delete("/orders/" + IdRef.current),
       {
-        loading: t("common.deleting"),
-        success: t("common.deleted"),
-        error: t("common.error_deleting"),
+        loading: t("list.deleting_order"),
+        success: t("list.order_deleted"),
+        error: t("list.error_deleting_order"),
       },
       { id: "deleteOrder" }
     );
+    closeModal();
+    await fetchOrders(country);
   }
 
   useEffect(() => {
@@ -118,17 +135,23 @@ export default function List() {
       <div className="space-y-2">
         <input type="text" placeholder={t("common.search")} value={search?.str} onChange={(e: any) => setSearch({ ...search, str: e.target.value })} className="w-full px-2 py-2 rounded-full border border-black focus:border-orange-600 focus:outline-0" />
         <div className="grid grid-cols-2 gap-2">
-          <select onChange={(e: any) => setSearch({ ...search, cityId: e.target.value })} className="w-full text-center bg-white p-2 rounded-full border border-black">
+          <select onChange={(e: any) => setSearch({ ...search, cityId: e.target.value })} className="w-full focus:outline-0 text-center bg-white p-2 rounded-full border border-black">
             <option value="">{t("list.all_cities")}</option>
             {cities.map((city: City) => (
-              <option key={city.id} value={city.id}>
+              <option key={"city-" + city.id} value={city.id}>
                 {city.name}
               </option>
             ))}
           </select>
-          <input type="date" className="text-center border border-black rounded-full" onChange={(e: any) => setSearch({ ...search, date: e.target.value })} value={search.date} />
+          <div className="relative w-full border border-black rounded-full bg-white flex justify-center items-center">
+            <input type="date" onChange={(e: any) => setSearch((prev) => ({ ...prev, date: e.target.value }))} id="date" className=" opacity-0 peer bg-transparent focus:outline-0 w-fit text-center rounded-full p-2" />
+            <label htmlFor="date" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all">
+              {search.date ? new Date(search.date).toLocaleDateString("fr-FR") : "dd/mm/yyyy"}
+            </label>
+          </div>
+          {/* <input type="date" className="text-center w-full border border-black rounded-full" onChange={(e: any) => setSearch({ ...search, date: e.target.value })} value={search.date} /> */}
         </div>
-        <Button className="flex items-center gap-2 justify-center w-full rounded-full py-3">
+        <Button disabled={!filtered.length} onClick={() => printList(filtered)} className="flex items-center gap-2 justify-center w-full rounded-full py-3">
           <Printer />
           {t("common.print")}
         </Button>
@@ -163,8 +186,15 @@ export default function List() {
                 <Map size={18} className="text-gray-500" />
               </div>
             </div>
-            <div className="grid grid-cols-3">
-               <Button className="rounded-none bg-green-500 hover:bg-green-400 rounded-bl-xl flex gap-1 justify-center items-center">
+            <div className="grid grid-cols-12">
+              <Button className="rounded-none px-0 col-span-3 rounded-bl-xl rtl:rounded-bl-none rtl:rounded-br-xl flex gap-1 justify-center items-center" onClick={() => handleShowDetails(order.id)}>
+                {t("list.details")}
+              </Button>
+              <Button onClick={() => handleShowStatusModal(order.id, order.status)} className="rounded-none col-span-6 flex gap-1 justify-center items-center bg-orange-600">
+                <p>{t("list." + order?.status || "list.unknown")}</p>
+                <PackageSearch />
+              </Button>
+              <Button className="rounded-none col-span-3 bg-green-600 rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl flex gap-1 justify-center items-center">
                 <a href={`https://api.whatsapp.com/send?phone=${order.recipientPhoneCode.slice(1)}${order.recipientPhone}`} target="_blank">
                   <svg fill="#ffffff" width="32px" height="32px" viewBox="-6.4 -6.4 44.80 44.80" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" strokeWidth="0.00032">
                     <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -176,19 +206,11 @@ export default function List() {
                   </svg>
                 </a>
               </Button>
-              <Button className="rounded-none flex gap-1 justify-center items-center" onClick={() => handleShowDetails(order.id)}>
-                {t("list.details")}
-                <Info size={18} />
-              </Button>
-              <Button className="rounded-none rounded-br-xl flex gap-1 justify-center items-center bg-orange-600 hover:bg-orange-500">
-                <p>{order.status}</p>
-                <PackageSearch />
-                {/* <CircleQuestionMark size={18} /> */}
-              </Button>
             </div>
           </div>
         ))}
       </div>
+      {openStatusModal && <StatusModal open={openStatusModal} close={closeModal} orderId={IdRef.current as number} orderStatus={openStatusModalStatus} fetchOrders={fetchOrders} />}
       <DeleteModal open={openDeleteModal} close={closeModal} fn={deleteOrder} />
       {openDetailsModal && <OrderDetailsModal open={openDetailsModal} close={closeModal} orderId={IdRef.current as number} />}
     </>
@@ -205,6 +227,8 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
   const [openDelete, setOpenDelete] = useState<boolean>(false);
   const [order, setOrder] = useState<Order>();
   const [emblaRef] = useEmblaCarousel({ loop: false });
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     (async () => {
@@ -236,7 +260,7 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
             <div className="px-4 pb-1 flex justify-between items-center">
               <div className={clsx("text-xs py-1 px-2 rounded-full", order?.paid ? "bg-green-400" : "bg-red-400")}>{order?.paid ? t("list.paid") : t("list.unpaid")}</div>
               <div className="bg-purple-900 text-white px-2 py-1 rounded">{order?.parcelCode}</div>
-              <div className={clsx("text-xs py-1 px-2 rounded-full", statusColors[order?.status || "unknown"])}>{t(order?.status || "unknown")}</div>
+              <div className={clsx("text-xs py-1 px-2 rounded-full", statusColors[order?.status || "unknown"])}>{t("list." + order?.status || "list.unknown")}</div>
             </div>
             <div className="overflow-y-auto ">
               <div className="px-4 pb-1 divide-y">
@@ -254,26 +278,34 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
                 </div>
                 <div className="flex justify-between items-center py-1 bg-green-100">
                   <span>{t("list.phone")}</span>
-                  <span>{order?.recipientPhoneCode + " " + order?.recipientPhone}</span>
+                  <span dir="ltr">{order?.recipientPhoneCode + " " + order?.recipientPhone}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 bg-green-100">
                   <span>{t("list.city")}</span>
                   <span>{order?.recipientCity.name}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 bg-red-100">
-                  <span>{t("list.name")} Exp.</span>
+                  <span>
+                    {t("list.name")} {t("common.shipper")}
+                  </span>
                   <span>{order?.shipper.name}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 bg-red-100">
-                  <span>{t("list.cin")} Exp.</span>
+                  <span>
+                    {t("list.cin")} {t("common.shipper")}
+                  </span>
                   <span>{order?.shipper.cin}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 bg-red-100">
-                  <span>{t("list.phone")} Exp.</span>
-                  <span>{order?.shipper.phoneCode + " " + order?.shipper.phone}</span>
+                  <span>
+                    {t("list.phone")} {t("common.shipper")}
+                  </span>
+                  <span dir="ltr">{order?.shipper.phoneCode + " " + order?.shipper.phone}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 bg-red-100">
-                  <span>{t("list.city")} Exp.</span>
+                  <span>
+                    {t("list.city")} {t("common.shipper")}
+                  </span>
                   <span>{order?.shipper.city.name}</span>
                 </div>
                 <div className="flex justify-between items-center py-1">
@@ -299,9 +331,9 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
               </div>
               <div className="px-4">
                 <div className="overflow-hidden" ref={emblaRef}>
-                  <div className="flex -ml-8">
-                    {order?.pics.map((pic) => (
-                      <div className="flex-[0_0_100%] aspect-video flex justify-center items-center pl-8">
+                  <div className="flex rtl:flex-row-reverse -ml-8">
+                    {order?.pics.map((pic, idx: number) => (
+                      <div key={"pic-" + idx} className="flex-[0_0_100%] aspect-video flex justify-center items-center pl-8">
                         <img src={import.meta.env.VITE_PUBLIC_API_URL + pic.url} alt="pic" className="max-w-full max-h-full object-cover" />
                       </div>
                     ))}
@@ -310,11 +342,68 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
               </div>
             </div>
             <br />
-            <div className="flex justify-end items-center gap-2 px-4">
-              <Button onClick={closeModal} className="bg-gray-600 hover:bg-gray-500">
+            <div className="flex justify-between items-center gap-2 px-4">
+              <Button onClick={() => printElement(order as Order)}>{t("common.print")}</Button>
+              <Button onClick={() => navigate("/add", { state: order })} className="bg-orange-600">
+                {t("common.edit")}
+              </Button>
+              <Button onClick={closeModal} className="bg-gray-600">
+                {t("common.close")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function StatusModal({ open, close, orderId, orderStatus, fetchOrders }: any) {
+  const [openDelete, setOpenDelete] = useState<boolean>(false);
+  const { t } = useTranslation();
+  const [status, setStatus] = useState<string>(orderStatus);
+  const statuses = ["origin", "inStock", "inTransit", "delivered", "notDelivered"];
+  const { country } = useCountry();
+
+  useEffect(() => {
+    setOpenDelete(open);
+  }, [open]);
+
+  function closeModal() {
+    setOpenDelete(false);
+    setTimeout(close, 300);
+  }
+
+  async function handleUpdateStatus() {
+    await toast.promise(api.put(`/orders/${orderId}/status`, { status }), {
+      loading: t("list.updating_status"),
+      success: t("list.status_updated"),
+      error: t("list.error_updating_status"),
+    });
+    fetchOrders(country);
+    closeModal();
+  }
+
+  return (
+    <>
+      {open && (
+        <div className={clsx("absolute inset-0 flex justify-center items-center duration-300", openDelete ? "bg-black/60" : "bg-black/0")}>
+          <div className={clsx("p-4 w-5/6 max-h-[calc(100%/6*4)] bg-white rounded-xl shadow-xl flex flex-col duration-300", openDelete ? "scale-100 opacity-100" : "scale-90 opacity-0")}>
+            <div className="space-y-2">
+              {statuses.map((s) => (
+                <div onClick={() => setStatus(s)} className={clsx("border rounded-xl text-center p-4 duration-300", s === status ? "border-orange-500 bg-orange-100" : "border-black")}>
+                  {t("list." + s)}
+                </div>
+              ))}
+            </div>
+            <br />
+            <div dir="ltr" className="flex justify-end items-center gap-2">
+              <Button onClick={closeModal} className="bg-gray-600">
                 {t("common.cancel")}
               </Button>
-              <Button className="bg-red-600 hover:bg-red-500">{t("common.delete")}</Button>
+              <Button onClick={handleUpdateStatus} className="bg-orange-600">
+                {t("common.save")}
+              </Button>
             </div>
           </div>
         </div>

@@ -7,10 +7,10 @@ import type City from "@/types/city";
 import type Client from "@/types/client";
 import axios from "axios";
 import clsx from "clsx";
-import { t } from "i18next";
 import { Pen, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 type Country = {
   code: string;
@@ -27,6 +27,8 @@ export default function Clients() {
   const [openDelete, setOpenDelete] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
   const { country } = useCountry();
+  const {t} = useTranslation()
+
 
   async function fetchClients(country: "Morocco" | "France") {
     const res = await api.get("/clients/country/" + country);
@@ -110,13 +112,13 @@ export default function Clients() {
       </div>
       <br />
       <ul className="space-y-2">
-        {clients.map((client: Client) => (
-          <li className="flex bg-white rounded-xl border shadow-lg">
+        {clients.map((client: Client,idx:number) => (
+          <li key={"client"+idx} className="flex bg-white rounded-xl border shadow-lg">
             <div className="grid grid-cols-3 flex-1 p-4">
               <span>{t("client.name")}:</span>
               <span className="col-span-2">{client.name}</span>
               <span>{t("client.phone")}:</span>
-              <span className="col-span-2">{client.phoneCode+" "+client.phone}</span>
+              <span className="col-span-2 text-start" dir="ltr">{client.phoneCode+" "+client.phone}</span>
               <span>{t("client.cin")}:</span>
               <span className="col-span-2">{client.cin}</span>
               <span>{t("city.city")}:</span>
@@ -125,10 +127,10 @@ export default function Clients() {
               <span className="col-span-2">{client.address}</span>
             </div>
             <div className="grid grid-cols-1">
-              <Button onClick={() => handleEdit(client)} className="bg-orange-600 rounded-none rounded-tr-xl hover:bg-orange-500">
+              <Button onClick={() => handleEdit(client)} className="bg-orange-600 rounded-none rounded-tr-xl rtl:rounded-tr-none rtl:rounded-tl-xl">
                 <Pen />
               </Button>
-              <Button onClick={() => handleDelete(client.id)} className="bg-red-600 rounded-none rounded-br-xl hover:bg-red-500">
+              <Button onClick={() => handleDelete(client.id)} className="bg-red-600 rounded-none rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl">
                 <Trash2 />
               </Button>
             </div>
@@ -154,6 +156,8 @@ type ModalProps = {
 function Modal({ editing, client, setClient, cities, open, close, save }: ModalProps) {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [countries, setCountries] = useState<Country[]>([]);
+  const {t} = useTranslation()
+
 
 
   useEffect(() => {
@@ -187,12 +191,12 @@ function Modal({ editing, client, setClient, cities, open, close, save }: ModalP
               <div className="flex flex-col">
                 <label>{t("client.phone")}</label>
                 <div className="flex border border-gray-300 rounded group flex-1 w-full">
-                  <select onChange={(e: any) => setClient({ ...client, phoneCode: e.target.value })} className="w-14 bg-white px-2 focus:outline-none" value={client.phoneCode}>
+                  <select onChange={(e: any) => setClient({ ...client, phoneCode: e.target.value })} className="w-28 bg-white px-2 focus:outline-none" value={client.phoneCode}>
                     {countries.map((country, idx: number) => {
                       return (
                         country.phone_code && (
                           <option value={country.phone_code} key={idx}>
-                            {country.flag} {country.name} {country.phone_code}
+                            {country.flag} {country.phone_code}
                           </option>
                         )
                       );
@@ -203,9 +207,10 @@ function Modal({ editing, client, setClient, cities, open, close, save }: ModalP
               </div>
               <div className="flex flex-col">
                 <label>{t("city.city")}</label>
-                <select onChange={(e: any) => setClient({ ...client, cityId: Number(e.target.value) })} className="h-10 bg-white focus:outline-0 focus:border-black rounded border border-gray-300 px-2">
+                <select value={client.cityId} onChange={(e: any) => setClient({ ...client, cityId: Number(e.target.value) })} className="h-10 bg-white focus:outline-0 focus:border-black rounded border border-gray-300 px-2">
+                  <option value={undefined}>{t("common.select_city")}</option>
                   {cities.map((city: City) => (
-                    <option key={city.id} value={city.id} selected={client.cityId === city.id}>
+                    <option key={city.id} value={city.id}>
                       {city.name}
                     </option>
                   ))}
@@ -222,7 +227,7 @@ function Modal({ editing, client, setClient, cities, open, close, save }: ModalP
             </div>
             <br />
             <div className="flex justify-end items-center gap-2 px-4">
-              <Button onClick={closeModal} className="bg-gray-600 hover:bg-gray-500">
+              <Button onClick={closeModal} className="bg-gray-600">
                 {t("common.cancel")}
               </Button>
               <Button onClick={save}>{editing ? t("common.save") : t("common.add")} </Button>

@@ -8,7 +8,7 @@ export class CitiesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.city.findMany();
+    return this.prisma.city.findMany({orderBy: {name: 'asc'}});
   }
 
   async findByCountry(country: Country) {

@@ -25,11 +25,16 @@
     "logout": "Se déconnecter"
   },
   "common": {
+    "french": "Français",
+    "arabic": "Arabe",
     "no_internet": "Pas de connexion Internet",
     "change_language": "Changer de langue",
+    "shipper": "Exp.",
     "yes": "Oui",
     "no": "Non",
     "cancel": "Annuler",
+    "close": "Fermer",
+    "edit": "Modifier",
     "search": "Rechercher",
     "print": "Imprimer",
     "country": "Pays",
@@ -37,13 +42,17 @@
     "save": "Enregistrer",
     "delete": "Supprimer",
     "error": "Erreur",
+    "select_city": "Sélectionnez une ville",
     "delete_confirm": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+
     "adding": "Ajout en cours...",
     "added": "Ajouté",
     "add_error": "Erreur d'ajout",
+
     "saving": "Modification en cours...",
     "saved": "Modifié",
     "save_error": "Erreur de modification",
+
     "deleting": "Suppression en cours...",
     "deleted": "Supprimé",
     "delete_error": "Erreur de suppression"
@@ -64,6 +73,7 @@
   "list": {
     "all_cities": "Toutes les villes",
     "parcel_code": "Code de colis",
+    "parcel_number": "Numero de Colis",
     "home_delivery": "à domicile",
     "paid": "Payé",
     "unpaid": "Non payé",
@@ -75,13 +85,21 @@
     "weight": "Poids",
     "paid_amount": "Montant payé",
     "details": "Détails",
-    "product_type":"Type de produit",
+    "product_type": "Type de produit",
     "origin": "Origine",
     "inTransit": "En transit",
     "delivered": "Livré",
     "inStock": "En stock",
     "notDelivered": "Non livré",
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "updating_status": "Mise à jour du statut en cours...",
+    "status_updated": "Statut mis à jour",
+    "error_updating_status": "Erreur lors de la mise à jour du statut",
+    "delete": {
+      "deleting_order": "Suppression de la commande...",
+      "order_deleted": "Commande supprimée",
+      "error_deleting_order": "Erreur lors de la suppression de la commande"
+    }
   },
   "add": {
     "parcel_number": "Numero de Colis",
@@ -93,15 +111,14 @@
     "home_delivery": "Livraison à domicile",
     "error_empty_fields": "Veuillez remplir tous les champs obligatoires",
     "save": {
-      "adding_shipper": "Ajout de l'expéditeur...",
-      "added_shipper": "Expéditeur ajouté",
-      "add_shipper_error": "Erreur lors de l'ajout de l'expéditeur",
-      "adding_recipient": "Ajout du destinataire...",
-      "added_recipient": "Destinataire ajouté",
-      "add_recipient_error": "Erreur lors de l'ajout du destinataire",
-      "adding_parcel": "Ajout du colis...",
-      "added_parcel": "Colis ajouté",
-      "add_parcel_error": "Erreur lors de l'ajout du colis"
+      "adding_order": "Ajout de la commande...",
+      "order_added": "Commande ajoutée",
+      "error_adding_order": "Erreur lors de l'ajout de la commande"
+    },
+    "update": {
+      "updating_order": "Mise à jour de la commande...",
+      "order_updated": "Commande mise à jour",
+      "error_updating_order": "Erreur lors de la mise à jour de la commande"
     },
     "shipper": {
       "shipper": "Expéditeur",

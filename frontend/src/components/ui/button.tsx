@@ -13,7 +13,7 @@ export default function Button(props: ButtonProps) {
       onClick={props.onClick}
       disabled={props.disabled}
       className={clsx(
-        "px-4 py-2 rounded transition bg-blue-800 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed",
+        "px-4 py-2 rounded transition bg-blue-800 text-white disabled:opacity-50 disabled:cursor-not-allowed",
         props.className
       )}
     >

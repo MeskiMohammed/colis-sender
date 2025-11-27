@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { useCountry } from "@/providers/CountryProvider";
-import { t } from "i18next";
 import { Trash2 } from "lucide-react";
 import Button from "@/components/ui/button";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import type City from "@/types/city";
 import DeleteModal from "@/components/deleteModal";
+import { useTranslation } from "react-i18next";
 
 export default function Cities() {
   const [cities, setCities] = useState<City[]>([]);
   const [city, setCity] = useState<Partial<City>>({});
   const [openDelete, setOpenDelete] = useState<boolean>(false);
   const { country } = useCountry();
+  const {t} = useTranslation()
+
 
   async function fetchCities(country: "Morocco" | "France") {
     try {
@@ -75,16 +77,16 @@ export default function Cities() {
     <>
       <div>
         <div className="grid grid-cols-12 mb-8">
-          <input type="text" placeholder={t("city.add_city")} value={city.name} onChange={(e: any) => setCity({ ...city, name: e.target.value })} className="col-span-9 px-2 rounded-l-full border border-black focus:border-orange-600 focus:outline-0" />
-          <Button onClick={addCity} className="rounded-r-full col-span-3">
+          <input type="text" placeholder={t("city.add_city")} value={city.name} onChange={(e: any) => setCity({ ...city, name: e.target.value })} className="col-span-9 px-2 rounded-l-full rtl:rounded-l-none rtl:rounded-r-full border border-black focus:border-orange-600 focus:outline-0" />
+          <Button onClick={addCity} className="rounded-r-full rtl:rounded-r-none rtl:rounded-l-full col-span-3">
             {t("common.add")}
           </Button>
         </div>
         <ul className="space-y-2">
           {cities.map((city: City) => (
             <li key={city.id} className="flex border border-black rounded-xl justify-between items-center">
-              <span className="ml-2">{city.name}</span>
-              <Button className="bg-red-600 aspect-square hover:bg-red-500 rounded-xl" onClick={() => handleDelete(city.id)}>
+              <span className="mx-2">{city.name}</span>
+              <Button className="bg-red-600 aspect-square rounded-xl" onClick={() => handleDelete(city.id)}>
                 <Trash2 />
               </Button>
             </li>

@@ -1,21 +1,148 @@
 {
-    "login": {
-        "login": "تسجيل الدخول",
-        "email": "البريد الإلكتروني",
-        "password": "كلمة المرور"
-    },
-    "common": {
-        "logout": "تسجيل الخروج",
-        "submit": "إرسال",
-        "cancel": "إلغاء",
-        "search": "بحث",
-        "change_language": "تغيير اللغة"
-    },
-    "welcome": "مرحبًا بكم في تطبيقنا",
-    "settings": "الإعدادات",
+  "login": {
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "email_empty": "يرجى إدخال البريد الإلكتروني",
+    "password_empty": "يرجى إدخال كلمة المرور",
+    "email_error": "بريد إلكتروني غير صالح",
+    "password_error": "كلمة مرور غير صالحة",
+    "logging_in": "جاري تسجيل الدخول...",
+    "logged_in": "تم تسجيل الدخول",
+    "login_error": "خطأ في تسجيل الدخول"
+  },
+  "sidebar": {
+    "maf": "من المغرب إلى فرنسا",
+    "fam": "من فرنسا إلى المغرب",
+    "add": "إضافة",
+    "list": "القائمة",
+    "clients": "العملاء",
+    "cities": "المدن"
+  },
+  "user": {
     "profile": "الملف الشخصي",
-    "language": "اللغة",
-    "home": "الرئيسية",
-    "about": "حول",
-    "contact": "اتصل بنا"
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "common": {
+    "french": "الفرنسية",
+    "arabic": "العربية",
+    "no_internet": "لا يوجد اتصال بالإنترنت",
+    "change_language": "تغيير اللغة",
+    "shipper": "(المرسل)",
+    "yes": "نعم",
+    "no": "لا",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "edit": "تعديل",
+    "search": "بحث",
+    "print": "طباعة",
+    "country": "البلد",
+    "add": "إضافة",
+    "save": "حفظ",
+    "delete": "حذف",
+    "error": "خطأ",
+    "select_city": "اختر مدينة",
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+
+    "adding": "جاري الإضافة...",
+    "added": "تمت الإضافة",
+    "add_error": "خطأ أثناء الإضافة",
+
+    "saving": "جاري التعديل...",
+    "saved": "تم التعديل",
+    "save_error": "خطأ أثناء التعديل",
+
+    "deleting": "جاري الحذف...",
+    "deleted": "تم الحذف",
+    "delete_error": "خطأ أثناء الحذف"
+  },
+  "city": {
+    "city": "المدينة",
+    "add_city": "إضافة مدينة"
+  },
+  "client": {
+    "create": "إضافة عميل",
+    "edit": "تعديل عميل",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "email": "البريد الإلكتروني",
+    "address": "العنوان",
+    "cin": "البطاقة الوطنية"
+  },
+  "list": {
+    "all_cities": "جميع المدن",
+    "parcel_code": "رمز الطرد",
+    "parcel_number": "رقم الطرد",
+    "home_delivery": "تسليم إلى المنزل",
+    "paid": "مدفوع",
+    "unpaid": "غير مدفوع",
+    "name": "الاسم",
+    "city": "المدينة",
+    "phone": "الهاتف",
+    "cin": "البطاقة الوطنية",
+    "number_parcels": "عدد الطرود",
+    "weight": "الوزن",
+    "paid_amount": "المبلغ المدفوع",
+    "details": "التفاصيل",
+    "product_type": "نوع المنتج",
+    "origin": "الأصل",
+    "inTransit": "في الطريق",
+    "delivered": "تم التسليم",
+    "inStock": "في المخزن",
+    "notDelivered": "غير مسلّم",
+    "unknown": "غير معروف",
+    "delete": {
+      "deleting_order": "جاري حذف الطلب...",
+      "order_deleted": "تم حذف الطلب",
+      "error_deleting_order": "حدث خطأ أثناء حذف الطلب"
+    }
+  },
+  "add": {
+    "parcel_number": "رقم الطرد",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "city": "المدينة",
+    "address": "العنوان",
+    "cin": "البطاقة الوطنية",
+    "home_delivery": "التوصيل إلى المنزل",
+    "error_empty_fields": "يرجى ملء جميع الحقول المطلوبة",
+    "save": {
+      "adding_order": "جاري إضافة الطلب...",
+      "order_added": "تمت إضافة الطلب",
+      "error_adding_order": "خطأ أثناء إضافة الطلب"
+    },
+    "update": {
+      "updating_order": "جاري تحديث الطلب...",
+      "order_updated": "تم تحديث الطلب",
+      "error_updating_order": "خطأ أثناء تحديث الطلب"
+    },
+    "shipper": {
+      "shipper": "المرسل",
+      "description": "معلومات عن المرسل",
+      "select_shipper": "اختر المرسل"
+    },
+    "recipient": {
+      "recipient": "المستلم",
+      "description": "معلومات عن المستلم"
+    },
+    "parcel": {
+      "product_type": "نوع المنتج",
+      "parcel": "الطرد",
+      "description": "معلومات عن الطرد",
+      "paid": "مدفوع",
+      "paid_amount": "المبلغ المدفوع",
+      "weight": "الوزن",
+      "number_parcels": "عدد الطرود",
+      "pics": "صور الطرود",
+      "pics_warning": "سيتم تجاهل الملفات غير الصورية أو التي يتجاوز حجمها 5 ميغابايت"
+    }
+  },
+  "welcome": "مرحبًا بك في تطبيقنا",
+  "settings": "الإعدادات",
+  "profile": "الملف الشخصي",
+  "language": "اللغة",
+  "home": "الرئيسية",
+  "about": "حول",
+  "contact": "اتصال"
 }

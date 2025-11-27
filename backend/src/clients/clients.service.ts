@@ -17,9 +17,11 @@ export class ClientsService {
         phoneCode: true,
         phone: true,
         address: true,
+        cityId:true,
         city: { select: { name: true } },
       },
       where: { country },
+      orderBy: { name: 'asc' },
     });
   }
 

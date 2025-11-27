@@ -1,8 +1,10 @@
-import { Controller, Delete, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Delete, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { CitiesService } from './cities.service';
 import { Country } from '@prisma/client';
 import { CreateCityDto } from './dto/create-city.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('cities')
 export class CitiesController {
     constructor(private readonly citiesService: CitiesService) {}

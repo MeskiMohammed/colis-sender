@@ -29,10 +29,10 @@ export default function DeleteModal({ open, close, fn }: props) {
             <div className="px-4">{t("common.delete_confirm")}</div>
             <br />
             <div className="flex justify-end items-center gap-2 px-4">
-              <Button onClick={closeModal} className="bg-gray-600 hover:bg-gray-500">
+              <Button onClick={closeModal} className="bg-gray-600">
                 {t("common.cancel")}
               </Button>
-              <Button onClick={fn} className="bg-red-600 hover:bg-red-500">
+              <Button onClick={fn} className="bg-red-600">
                 {t("common.delete")}
               </Button>
             </div>
