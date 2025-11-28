@@ -48,12 +48,12 @@ export default function Login() {
   }
 
   return (
-    <div className="h-[100dvh] flex flex-col overflow-hidden relative">
-      <div className="h-[30%] sm:h-[20%] bg-primary rounded-b-[7rem] flex justify-center items-center">
+    <div className="absolute inset-0 flex flex-col overflow-hidden">
+      <div className="h-1/3 bg-primary flex justify-center items-center">
         <img src="/logo-white.png" className="h-5/6" alt="logo" />
       </div>
-      <div className="flex-1 flex flex-col py-10 items-center text-primary">
-        <div className="w-10/12 space-y-8">
+      <div className="flex-1 flex flex-col justify-center  items-center text-primary">
+        <div className="w-10/12 space-y-4">
           <h1 className="text-3xl text-center">{t("login.login")}</h1>
           <br />
           <form onSubmit={handleSubmit}>
@@ -86,7 +86,7 @@ export default function Login() {
                     setError({ ...error, password: false });
                   }}
                 />
-                {showPassword ? <Eye onClick={()=>setShowPassword(false)} className="z-10 absolute top-1/2 -translate-y-1/2 right-2" /> : <EyeClosed onClick={()=>setShowPassword(true)} className="absolute top-1/2 -translate-y-1/2 right-2" />}
+                {showPassword ? <Eye onClick={() => setShowPassword(false)} className="z-10 absolute top-1/2 -translate-y-1/2 right-2" /> : <EyeClosed onClick={() => setShowPassword(true)} className="absolute top-1/2 -translate-y-1/2 right-2" />}
               </div>
               <p className="text-red-600 text-sm h-4">{error?.password ? t("login.password_error") : ""}</p>
             </div>
@@ -96,7 +96,7 @@ export default function Login() {
           </form>
         </div>
       </div>
-      <div className="h-[10%] w-full bg-primary rounded-t-[7rem]"></div>
+      {/* <div className="h-[10%] w-full bg-primary rounded-t-[7rem]"></div> */}
     </div>
   );
 }

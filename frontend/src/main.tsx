@@ -10,7 +10,6 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 createRoot(document.getElementById("root")!).render(
-  // <StrictMode>
   <Wrapper>
     <Router>
       <AuthProvider>
@@ -21,15 +20,18 @@ createRoot(document.getElementById("root")!).render(
       </AuthProvider>
     </Router>
   </Wrapper>
-  // </StrictMode>
 );
 
 function Wrapper({ children }: { children: React.ReactNode }) {
-  const { i18n } = useTranslation(); // destructure i18n
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     document.documentElement.setAttribute("dir", i18n.language === "ar" ? "rtl" : "ltr");
   }, [i18n.language]);
 
-  return <>{children}</>;
+  return (
+    <div className="safe-area-y w-screen h-screen bg-black overflow-hidden">
+      <div className="relative w-full h-full overflow-hidden bg-blue-50">{children}</div>
+    </div>
+  );
 }

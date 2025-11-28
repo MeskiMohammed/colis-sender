@@ -62,6 +62,7 @@ export default function Add() {
   const [openClientsModal, setOpenClientsModal] = useState<boolean>(false);
   const [previews, setPreviews] = useState<string[]>([]);
   const [picIdx, setPicIdx] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const { state: order }: { state: Order } = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -91,60 +92,51 @@ export default function Add() {
   }, []);
 
   async function handleSaveOrder() {
-    if (!checkShipper() || !checkRecipient() || !checkParcel()) {
-      toast.error(t("add.error_empty_fields"), { id: "empty" });
-      return;
-    }
-    let id;
-    if (shipper.id === undefined) {
-      const res = await api.post("clients", shipper);
-      id = res.data.id;
-    } else {
-      id = shipper.id;
-    }
+    if (loading) return;
+    setLoading(true);
 
-    if (order) {
-      const deletedPics = order.pics.filter((pic) => !previews.includes(import.meta.env.VITE_PUBLIC_API_URL + pic.url));
+    try {
+      if (!checkShipper() || !checkRecipient() || !checkParcel()) {
+        toast.error(t("add.error_empty_fields"), { id: "empty" });
+        return;
+      }
 
-      await Promise.all([
-        toast.promise(
-          api.put("/orders/" + order.id, { shipperId: id, ...recipient, ...parcel }),
-          {
-            loading: t("common.saving"),
-            success: () => {
-              clearShipper();
-              clearRecipient();
-              clearParcel();
-              return t("common.saved");
-            },
-            error: t("common.save_error"),
-          },
-          { id: "add_order" }
-        ),
-        await handleSavePics(order.id),
-        await handleDeletePics(deletedPics.map((pic: any) => pic.id)),
-      ]);
+      let id;
+      if (shipper.id === undefined) {
+        const res = await api.post("clients", shipper);
+        id = res.data.id;
+      } else {
+        id = shipper.id;
+      }
+
+      if (order) {
+        const deletedPics = order.pics.filter((pic) => !previews.includes(import.meta.env.VITE_PUBLIC_API_URL + pic.url));
+        await toast.promise(Promise.all([api.put("/orders/" + order.id, { shipperId: id, ...recipient, ...parcel }), handleSavePics(order.id), handleDeletePics(deletedPics.map((pic: any) => pic.id))]), {
+          loading: t("common.saving"),
+          success: t("common.saved"),
+          error: t("common.save_error"),
+        });
+      } else {
+        const res = await toast.promise(api.post("/orders", { shipperId: id, ...recipient, ...parcel }), {
+          loading: t("common.saving"),
+          success: t("common.saved"),
+          error: t("common.save_error"),
+        });
+        await handleSavePics(res.data.id);
+      }
+
+      clearShipper();
+      clearRecipient();
+      clearParcel();
       clearPics();
-    } else {
-      const res = await toast.promise(
-        api.post("/orders", { shipperId: id, ...recipient, ...parcel }),
-        {
-          loading: t("common.added"),
-          success: () => {
-            clearShipper();
-            clearRecipient();
-            clearParcel();
-            return t("common.adding");
-          },
-          error: t("common.add_error"),
-        },
-        { id: "add_order" }
-      );
 
-      await handleSavePics(res.data.id);
-      clearPics();
+      navigate("/list");
+    } catch (err) {
+      console.error(err);
+      toast.error(t("common.save_error"));
+    } finally {
+      setLoading(false);
     }
-    navigate("/list");
   }
 
   function checkShipper() {
@@ -529,7 +521,7 @@ function ClientsModal({ open, setOpen, setShipper, country }: props) {
     <>
       {open && (
         <div className={clsx("absolute inset-0 flex justify-center items-center duration-300", openDelete ? "bg-black/60" : "bg-black/0")}>
-          <div className={clsx("py-4 space-y-4 w-5/6 max-h-[calc(100%/6*4)] bg-white rounded-xl shadow-xl duration-300", openDelete ? "scale-100 opacity-100" : "scale-90 opacity-0")}>
+          <div className={clsx("py-4 space-y-4 flex flex-col w-5/6 max-h-[calc(100%/6*4)] bg-white rounded-xl shadow-xl duration-300", openDelete ? "scale-100 opacity-100" : "scale-90 opacity-0")}>
             <div className="flex justify-between">
               <div className="px-4">{t("add.shipper.select_shipper")}</div>
               <button className="px-4" onClick={closeModal}>
@@ -539,7 +531,7 @@ function ClientsModal({ open, setOpen, setShipper, country }: props) {
             <div className="px-4">
               <Input value={search} onChange={(e: any) => setSearch(e.target.value)} placeholder={t("common.search")} />
             </div>
-            <div className="space-y-2 px-4 overflow-x-hidden overflow-y-auto">
+            <div className="space-y-2 flex-1 px-4 overflow-x-hidden overflow-y-auto">
               {filtered.map((client: Client) => (
                 <div
                   key={"client-" + client.id}

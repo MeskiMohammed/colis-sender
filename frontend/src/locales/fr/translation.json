@@ -59,7 +59,8 @@
   },
   "city": {
     "city": "Ville",
-    "add_city": "Ajouter une ville"
+    "add_city": "Ajouter une ville",
+    "city_empty": "Veuillez entrer le nom de la ville"
   },
   "client": {
     "create": "Ajouter un client",

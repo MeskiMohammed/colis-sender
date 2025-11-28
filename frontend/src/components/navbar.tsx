@@ -6,9 +6,9 @@ export default function Navbar() {
   const { i18n, t } = useTranslation();
 
   return (
-    <nav className="w-full h-16 bg-primary flex justify-between items-center rounded-b-xl px-8 text-white">
+    <nav className="w-full relative h-16 bg-primary flex justify-between items-center rounded-b-xl px-8 text-white">
       <SidebarTrigger />
-      <img src="/logo-white.png" alt="logo" className="h-full" />
+      <img src="/logo-white.png" alt="logo" className="absolute left-1/2 -translate-x-1/2 p-1 h-full" />
       <select className="bg-transparent focus:outline-0" value={i18n.language} onChange={(e:any) => i18n.changeLanguage(e.target.value)}>
         <option value="ar">🇲🇦{t('common.arabic')}</option>
         <option value="fr">🇫🇷{t('common.french')}</option>

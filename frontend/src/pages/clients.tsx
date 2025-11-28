@@ -26,9 +26,9 @@ export default function Clients() {
   const [open, setOpen] = useState<boolean>(false);
   const [openDelete, setOpenDelete] = useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { country } = useCountry();
-  const {t} = useTranslation()
-
+  const { t } = useTranslation();
 
   async function fetchClients(country: "Morocco" | "France") {
     const res = await api.get("/clients/country/" + country);
@@ -46,7 +46,103 @@ export default function Clients() {
     setOpen(true);
   }
 
+  function handleDelete(id: number) {
+    if (!id) {
+      toast.error("no id");
+      return;
+    }
+    setClient({ id } as Partial<Client>);
+    setOpenDelete(true);
+  }
+
+  async function deleteClient() {
+    if(loading)return
+    setLoading(true)
+    await toast.promise(api.delete("/clients/" + client.id), {
+      loading: t("common.deleting"),
+      success: ()=>{
+        fetchClients(country);
+        closeModal();
+        return t("common.deleted")},
+      error: t("common.delete_error"),
+    });
+    setLoading(false)
+  }
+
+  function closeModal() {
+    setOpen(false);
+    setOpenDelete(false);
+    setEditing(false);
+    setClient({ phoneCode: country === "Morocco" ? "+212" : "+33" } as Partial<Client>);
+  }
+
+  useEffect(() => {
+    (async () => {
+      await Promise.all([fetchClients(country), fetchCities(country)]);
+    })();
+    setClient({ phoneCode: country === "Morocco" ? "+212" : "+33" });
+  }, [country]);
+
+  return (
+    <>
+      <div className="flex justify-end">
+        <Button onClick={() => setOpen(true)}>{t("client.create")}</Button>
+      </div>
+      <br />
+      <ul className="space-y-2">
+        {clients.map((client: Client, idx: number) => (
+          <li key={"client" + idx} className="flex bg-white rounded-xl border shadow-lg">
+            <div className="grid grid-cols-3 flex-1 p-4">
+              <span>{t("client.name")}:</span>
+              <span className="col-span-2">{client.name}</span>
+              <span>{t("client.phone")}:</span>
+              <span className="col-span-2 text-start" dir="ltr">
+                {client.phoneCode + " " + client.phone}
+              </span>
+              <span>{t("client.cin")}:</span>
+              <span className="col-span-2">{client.cin}</span>
+              <span>{t("city.city")}:</span>
+              <span className="col-span-2">{client.city.name}</span>
+              <span>{t("client.address")}:</span>
+              <span className="col-span-2">{client.address}</span>
+            </div>
+            <div className="grid grid-cols-1">
+              <Button onClick={() => handleEdit(client)} className="bg-orange-600 rounded-none rounded-tr-xl rtl:rounded-tr-none rtl:rounded-tl-xl">
+                <Pen />
+              </Button>
+              <Button onClick={() => handleDelete(client.id)} className="bg-red-600 rounded-none rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl">
+                <Trash2 />
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <Modal editing={editing} client={client} setClient={setClient} cities={cities} open={open} close={closeModal} fetchClients={fetchClients} />
+      <DeleteModal open={openDelete} close={closeModal} fn={deleteClient} />
+    </>
+  );
+}
+
+type ModalProps = {
+  editing: boolean;
+  client: Partial<Client>;
+  setClient: (client: Partial<Client>) => void;
+  cities: City[];
+  open: boolean;
+  close: () => void;
+  fetchClients: (country: "Morocco" | "France") => void;
+};
+
+function Modal({ editing, client, setClient, cities, open, close, fetchClients }: ModalProps) {
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState<boolean>(false);
+  const { country } = useCountry();
+
   async function save() {
+    if(loading)return
+    setLoading(true);
     if (editing) {
       if (!client.id) {
         toast.error(t("common.error"));
@@ -66,99 +162,8 @@ export default function Clients() {
     }
     fetchClients(country);
     closeModal();
+    setLoading(false);
   }
-
-  function handleDelete(id: number) {
-    if (!id) {
-      alert("no id");
-      return;
-    }
-    setClient({ id } as Partial<Client>);
-    setOpenDelete(true);
-  }
-
-  async function deleteClient() {
-    try {
-      await toast.promise(api.delete("/clients/" + client.id), {
-        loading: t("common.deleting"),
-        success: t("common.deleted"),
-        error: t("common.delete_error"),
-      });
-      fetchClients(country);
-    } catch (err) {
-    } finally {
-      closeModal();
-    }
-  }
-
-  function closeModal() {
-    setOpen(false);
-    setOpenDelete(false);
-    setEditing(false);
-    setClient({phoneCode: country === "Morocco" ? "+212" : "+33"} as Partial<Client>);
-  }
-
-  useEffect(() => {
-    (async () => {
-      await Promise.all([fetchClients(country), fetchCities(country)]);
-    })();
-    setClient({phoneCode: country === "Morocco" ? "+212" : "+33"})
-  }, [country]);
-
-  return (
-    <>
-      <div className="flex justify-end">
-        <Button onClick={() => setOpen(true)}>{t("client.create")}</Button>
-      </div>
-      <br />
-      <ul className="space-y-2">
-        {clients.map((client: Client,idx:number) => (
-          <li key={"client"+idx} className="flex bg-white rounded-xl border shadow-lg">
-            <div className="grid grid-cols-3 flex-1 p-4">
-              <span>{t("client.name")}:</span>
-              <span className="col-span-2">{client.name}</span>
-              <span>{t("client.phone")}:</span>
-              <span className="col-span-2 text-start" dir="ltr">{client.phoneCode+" "+client.phone}</span>
-              <span>{t("client.cin")}:</span>
-              <span className="col-span-2">{client.cin}</span>
-              <span>{t("city.city")}:</span>
-              <span className="col-span-2">{client.city.name}</span>
-              <span>{t("client.address")}:</span>
-              <span className="col-span-2">{client.address}</span>
-            </div>
-            <div className="grid grid-cols-1">
-              <Button onClick={() => handleEdit(client)} className="bg-orange-600 rounded-none rounded-tr-xl rtl:rounded-tr-none rtl:rounded-tl-xl">
-                <Pen />
-              </Button>
-              <Button onClick={() => handleDelete(client.id)} className="bg-red-600 rounded-none rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl">
-                <Trash2 />
-              </Button>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <Modal editing={editing} client={client} setClient={setClient} cities={cities} open={open} close={closeModal} save={save} />
-      <DeleteModal open={openDelete} close={closeModal} fn={deleteClient} />
-    </>
-  );
-}
-
-type ModalProps = {
-  editing: boolean;
-  client: Partial<Client>;
-  setClient: (client: Partial<Client>) => void;
-  cities: City[];
-  open: boolean;
-  close: () => void;
-  save: () => void;
-};
-
-function Modal({ editing, client, setClient, cities, open, close, save }: ModalProps) {
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const {t} = useTranslation()
-
-
 
   useEffect(() => {
     setOpenModal(open);
@@ -230,7 +235,9 @@ function Modal({ editing, client, setClient, cities, open, close, save }: ModalP
               <Button onClick={closeModal} className="bg-gray-600">
                 {t("common.cancel")}
               </Button>
-              <Button onClick={save}>{editing ? t("common.save") : t("common.add")} </Button>
+              <Button disabled={loading} onClick={save}>
+                {editing ? t("common.save") : t("common.add")}{" "}
+              </Button>
             </div>
           </div>
         </div>

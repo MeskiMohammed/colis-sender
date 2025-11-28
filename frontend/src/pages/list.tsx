@@ -2,7 +2,7 @@ import Button from "@/components/ui/button";
 import api from "@/lib/api";
 import { useCountry } from "@/providers/CountryProvider";
 import type City from "@/types/city";
-import { Map, PackageSearch, Printer, Trash2, User } from "lucide-react";
+import { Map, PackageSearch, PencilLine, Printer, Trash2, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Parcel, Recipient, Shipper } from "./add";
 import DeleteModal from "@/components/deleteModal";
@@ -40,6 +40,7 @@ export default function List() {
   const [openDetailsModal, setOpenDetailsModal] = useState<boolean>(false);
   const [openStatusModal, setOpenStatusModal] = useState<boolean>(false);
   const [openStatusModalStatus, setOpenStatusModalStatus] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const IdRef = useRef<number | null>(null);
   const { country } = useCountry();
   const { t } = useTranslation();
@@ -83,6 +84,8 @@ export default function List() {
   }
 
   async function deleteOrder() {
+    if (loading) return;
+    setLoading(true);
     await toast.promise(
       api.delete("/orders/" + IdRef.current),
       {
@@ -94,6 +97,7 @@ export default function List() {
     );
     closeModal();
     await fetchOrders(country);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -226,6 +230,7 @@ type Props = {
 function OrderDetailsModal({ open, close, orderId }: Props) {
   const [openDelete, setOpenDelete] = useState<boolean>(false);
   const [order, setOrder] = useState<Order>();
+  const [pic, setPic] = useState<string | null>(null);
   const [emblaRef] = useEmblaCarousel({ loop: false });
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -257,74 +262,80 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
       {open && (
         <div className={clsx("absolute inset-0 flex justify-center items-center duration-300", openDelete ? "bg-black/60" : "bg-black/0")}>
           <div className={clsx("py-4 w-5/6 max-h-[calc(100%/6*5.5)] bg-white rounded-xl shadow-xl flex flex-col duration-300", openDelete ? "scale-100 opacity-100" : "scale-90 opacity-0")}>
-            <div className="px-4 pb-1 flex justify-between items-center">
-              <div className={clsx("text-xs py-1 px-2 rounded-full", order?.paid ? "bg-green-400" : "bg-red-400")}>{order?.paid ? t("list.paid") : t("list.unpaid")}</div>
-              <div className="bg-purple-900 text-white px-2 py-1 rounded">{order?.parcelCode}</div>
-              <div className={clsx("text-xs py-1 px-2 rounded-full", statusColors[order?.status || "unknown"])}>{t("list." + order?.status || "list.unknown")}</div>
+            <div className="px-4 pb-1 grid grid-cols-3 justify-between items-center">
+              <div className="w-full flex justify-start">
+                <div className={clsx("text-xs py-1 px-2 rounded-full", order?.paid ? "bg-green-400" : "bg-red-400")}>{order?.paid ? t("list.paid") : t("list.unpaid")}</div>
+              </div>
+              <div className="w-full flex justify-center">
+                <div className="bg-purple-900 text-white px-2 py-1 rounded">{order?.parcelCode}</div>
+              </div>
+              <div className="w-full flex justify-end">
+                <div className={clsx("text-xs py-1 px-2 rounded-full", statusColors[order?.status || "unknown"])}>{t("list." + order?.status || "list.unknown")}</div>
+              </div>
             </div>
             <div className="overflow-y-auto ">
               <div className="px-4 pb-1 divide-y">
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center p-1">
                   <span>{t("list.parcel_number")}</span>
                   <span>{order?.parcelNumber}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-green-100">
+                <div className="flex justify-between items-center p-1 bg-green-100">
                   <span>{t("list.name")}</span>
                   <span>{order?.recipientName}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-green-100">
+                <div className="flex justify-between items-center p-1 bg-green-100">
                   <span>{t("list.cin")}</span>
                   <span>{order?.recipientCin}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-green-100">
+                <div className="flex justify-between items-center p-1 bg-green-100">
                   <span>{t("list.phone")}</span>
                   <span dir="ltr">{order?.recipientPhoneCode + " " + order?.recipientPhone}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-green-100">
+                <div className="flex justify-between items-center p-1 bg-green-100">
                   <span>{t("list.city")}</span>
                   <span>{order?.recipientCity.name}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-red-100">
+                <div className="flex justify-between items-center p-1 bg-red-100">
                   <span>
                     {t("list.name")} {t("common.shipper")}
                   </span>
                   <span>{order?.shipper.name}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-red-100">
+                <div className="flex justify-between items-center p-1 bg-red-100">
                   <span>
                     {t("list.cin")} {t("common.shipper")}
                   </span>
                   <span>{order?.shipper.cin}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-red-100">
+                <div className="flex justify-between items-center p-1 bg-red-100">
                   <span>
                     {t("list.phone")} {t("common.shipper")}
                   </span>
                   <span dir="ltr">{order?.shipper.phoneCode + " " + order?.shipper.phone}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 bg-red-100">
+                <div className="flex justify-between items-center p-1 bg-red-100">
                   <span>
                     {t("list.city")} {t("common.shipper")}
                   </span>
                   <span>{order?.shipper.city.name}</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center p-1">
                   <span>{t("list.home_delivery")}</span>
                   <span>{order?.homeDelivery ? t("common.yes") : t("common.no")}</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center p-1">
                   <span>{t("list.paid_amount")}</span>
                   <span>{order?.paidAmount}</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center p-1">
                   <span>{t("list.number_parcels")}</span>
                   <span>{order?.nParcels}</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center p-1">
                   <span>{t("list.weight")}</span>
                   <span>{order?.weight}</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
+                <div className="flex justify-between items-center p-1">
                   <span>{t("list.product_type")}</span>
                   <span>{order?.productType}</span>
                 </div>
@@ -333,7 +344,7 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
                 <div className="overflow-hidden" ref={emblaRef}>
                   <div className="flex rtl:flex-row-reverse -ml-8">
                     {order?.pics.map((pic, idx: number) => (
-                      <div key={"pic-" + idx} className="flex-[0_0_100%] aspect-video flex justify-center items-center pl-8">
+                      <div key={"pic-" + idx} onClick={() => setPic(pic.url)} className="flex-[0_0_100%] aspect-video flex justify-center items-center pl-8">
                         <img src={import.meta.env.VITE_PUBLIC_API_URL + pic.url} alt="pic" className="max-w-full max-h-full object-cover" />
                       </div>
                     ))}
@@ -343,14 +354,26 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
             </div>
             <br />
             <div className="flex justify-between items-center gap-2 px-4">
-              <Button onClick={() => printElement(order as Order)}>{t("common.print")}</Button>
+              <Button onClick={() => printElement(order as Order)}>
+                <Printer />
+              </Button>
               <Button onClick={() => navigate("/add", { state: order })} className="bg-orange-600">
-                {t("common.edit")}
+                <PencilLine />
               </Button>
               <Button onClick={closeModal} className="bg-gray-600">
-                {t("common.close")}
+                <X />
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+      {pic !== null && (
+        <div className="absolute inset-0 bg-black/70">
+          <div className="relative w-full h-full flex justify-center items-center">
+            <button className="absolute top-0 right-0 text-white p-4" onClick={() => setPic(null)}>
+              <X />
+            </button>
+            <img src={import.meta.env.VITE_PUBLIC_API_URL + pic} key="showPic" alt="picture" className="rounded max-w-full max-h-[85dvh]" />
           </div>
         </div>
       )}
@@ -360,6 +383,7 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
 
 function StatusModal({ open, close, orderId, orderStatus, fetchOrders }: any) {
   const [openDelete, setOpenDelete] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { t } = useTranslation();
   const [status, setStatus] = useState<string>(orderStatus);
   const statuses = ["origin", "inStock", "inTransit", "delivered", "notDelivered"];
@@ -375,6 +399,8 @@ function StatusModal({ open, close, orderId, orderStatus, fetchOrders }: any) {
   }
 
   async function handleUpdateStatus() {
+    if (loading) return;
+    setLoading(true);
     await toast.promise(api.put(`/orders/${orderId}/status`, { status }), {
       loading: t("list.updating_status"),
       success: t("list.status_updated"),
@@ -382,6 +408,7 @@ function StatusModal({ open, close, orderId, orderStatus, fetchOrders }: any) {
     });
     fetchOrders(country);
     closeModal();
+    setLoading(false);
   }
 
   return (

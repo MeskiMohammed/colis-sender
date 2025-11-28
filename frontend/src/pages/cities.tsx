@@ -10,11 +10,11 @@ import { useTranslation } from "react-i18next";
 
 export default function Cities() {
   const [cities, setCities] = useState<City[]>([]);
-  const [city, setCity] = useState<Partial<City>>({});
+  const [city, setCity] = useState<{id?:number,name: string}>({name:''});
   const [openDelete, setOpenDelete] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { country } = useCountry();
-  const {t} = useTranslation()
-
+  const { t } = useTranslation();
 
   async function fetchCities(country: "Morocco" | "France") {
     try {
@@ -24,8 +24,11 @@ export default function Cities() {
   }
 
   async function addCity() {
+    if (loading) return;
+    setLoading(true);
     if (!city.name) {
       toast.error(t("city.city_empty"), { id: "city_add" });
+      setLoading(false)
       return;
     }
     await toast.promise(
@@ -37,8 +40,9 @@ export default function Cities() {
       },
       { id: "city_add" }
     );
-    setCity({});
+    setCity({name:''});
     fetchCities(country);
+    setLoading(false);
   }
 
   function handleDelete(id: number) {
@@ -46,11 +50,13 @@ export default function Cities() {
       toast.error(t("common.error"), { id: "city_error" });
       return;
     }
-    setCity({ id });
+    setCity({ id, name:'' });
     setOpenDelete(true);
   }
 
   async function deleteCity() {
+    if (loading) return;
+    setLoading(true);
     await toast.promise(
       api.delete("/cities/" + city.id),
       {
@@ -62,11 +68,12 @@ export default function Cities() {
     );
     fetchCities(country);
     closeModal();
+    setLoading(false);
   }
 
   function closeModal() {
     setOpenDelete(false);
-    setCity({});
+    setCity({name:''});
   }
 
   useEffect(() => {
