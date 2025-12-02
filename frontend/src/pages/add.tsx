@@ -6,7 +6,7 @@ import type City from "@/types/city";
 import type Client from "@/types/client";
 import axios from "axios";
 import clsx from "clsx";
-import { Eye, Trash2, X } from "lucide-react";
+import { ArrowLeft, Eye, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -27,13 +27,13 @@ export type Shipper = {
 export type Recipient = {
   recipientName: string;
   recipientCin: string;
-  homeDelivery: boolean;
   recipientCityId: number | undefined;
   recipientPhone: string;
   recipientPhoneCode: string;
 };
 
 export type Parcel = {
+  homeDelivery: boolean;
   parcelNumber: string;
   paid: boolean;
   paidAmount: number;
@@ -54,8 +54,8 @@ type Order = Recipient & Parcel & { id: number; pics: { url: string }[]; shipper
 export default function Add() {
   const { country } = useCountry();
   const [shipper, setShipper] = useState<Shipper>({ name: "", cin: "", phone: "", phoneCode: "", cityId: undefined, country: country, address: "" });
-  const [recipient, setRecipient] = useState<Recipient>({ recipientName: "", recipientCin: "", homeDelivery: true, recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: "" });
-  const [parcel, setParcel] = useState<Parcel>({ parcelNumber: "", paid: false, paidAmount: 0, nParcels: 1, productType: "", weight: 0 });
+  const [recipient, setRecipient] = useState<Recipient>({ recipientName: "", recipientCin: "", recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: "" });
+  const [parcel, setParcel] = useState<Parcel>({ homeDelivery: true, parcelNumber: "", paid: false, paidAmount: 0, nParcels: 1, productType: "", weight: 0 });
   const [pics, setPics] = useState<File[]>([]);
   const [cities, setCities] = useState<{ Morocco: City[]; France: City[] }>({ Morocco: [], France: [] });
   const [countries, setCountries] = useState<Country[]>([]);
@@ -63,6 +63,7 @@ export default function Add() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [picIdx, setPicIdx] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [clients, setClients] = useState<Client[]>([]);
   const { state: order }: { state: Order } = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -73,13 +74,13 @@ export default function Add() {
       setRecipient({
         recipientName: order.recipientName,
         recipientCin: order.recipientCin,
-        homeDelivery: order.homeDelivery,
         recipientCityId: order.recipientCityId,
         recipientPhone: order.recipientPhone,
         recipientPhoneCode: order.recipientPhoneCode,
       });
       setParcel({
         parcelNumber: order.parcelNumber,
+        homeDelivery: order.homeDelivery,
         paid: order.paid,
         paidAmount: order.paidAmount,
         nParcels: order.nParcels,
@@ -90,6 +91,15 @@ export default function Add() {
       setPics([]);
     }
   }, []);
+
+  useEffect(() => {
+    fetchClients(country);
+  }, [country]);
+
+  async function fetchClients(country: string) {
+    const res = await api.get("/clients/country/" + country);
+    setClients(res.data);
+  }
 
   async function handleSaveOrder() {
     if (loading) return;
@@ -118,9 +128,9 @@ export default function Add() {
         });
       } else {
         const res = await toast.promise(api.post("/orders", { shipperId: id, ...recipient, ...parcel }), {
-          loading: t("common.saving"),
-          success: t("common.saved"),
-          error: t("common.save_error"),
+          loading: t("common.adding"),
+          success: t("common.added"),
+          error: t("common.add_error"),
         });
         await handleSavePics(res.data.id);
       }
@@ -142,6 +152,7 @@ export default function Add() {
   function checkShipper() {
     const keys: (keyof Shipper)[] = ["name", "cin", "phone", "phoneCode", "cityId", "country", "address"];
     for (const k of keys) {
+      console.log(shipper[k]);
       if (!shipper[k]) return false;
     }
     return true;
@@ -149,6 +160,7 @@ export default function Add() {
   function checkRecipient() {
     const keys: (keyof Recipient)[] = ["recipientName", "recipientCin", "recipientCityId", "recipientPhone", "recipientPhoneCode"];
     for (const k of keys) {
+      console.log(recipient[k]);
       if (!recipient[k]) return false;
     }
     return true;
@@ -156,6 +168,7 @@ export default function Add() {
   function checkParcel() {
     const keys: (keyof Parcel)[] = ["parcelNumber", "paidAmount", "nParcels", "productType", "weight"];
     for (const k of keys) {
+      console.log(parcel[k]);
       if (!parcel[k]) return false;
     }
     return true;
@@ -165,10 +178,10 @@ export default function Add() {
     setShipper({ name: "", cin: "", phone: "", phoneCode: country === "Morocco" ? "+212" : "+33", cityId: undefined, country: country, address: "" });
   }
   function clearRecipient() {
-    setRecipient({ recipientName: "", recipientCin: "", homeDelivery: true, recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: country === "Morocco" ? "+33" : "+212" });
+    setRecipient({ recipientName: "", recipientCin: "", recipientCityId: undefined, recipientPhone: "", recipientPhoneCode: country === "Morocco" ? "+33" : "+212" });
   }
   function clearParcel() {
-    setParcel({ parcelNumber: "", paid: false, paidAmount: 0, nParcels: 1, productType: "", weight: 0 });
+    setParcel({ homeDelivery: true, parcelNumber: "", paid: false, paidAmount: 0, nParcels: 1, productType: "", weight: 0 });
   }
   function clearPics() {
     setPics([]);
@@ -196,7 +209,7 @@ export default function Add() {
   }
 
   useEffect(() => {
-    setShipper((prev) => ({ ...prev, phoneCode: country === "Morocco" ? "+212" : "+33", country: country }));
+    setShipper((prev) => ({ ...prev, phoneCode: country === "Morocco" ? "+212" : "+33", country }));
     setRecipient((prev) => ({ ...prev, recipientPhoneCode: country === "Morocco" ? "+33" : "+212" }));
     if (shipper.id !== undefined) clearShipper();
   }, [country]);
@@ -244,16 +257,37 @@ export default function Add() {
       width: 600,
       resultType: CameraResultType.Base64,
     });
-
     const file = base64ToFile(image.base64String!, `camera_${Date.now()}.jpeg`, `image/jpeg`);
-
     setPics((prev) => [...prev, file]);
-
     setPreviews((prev) => [...prev, URL.createObjectURL(file)]);
+  }
+
+  function searchClient(number: string) {
+    if (number.length === 9) {
+      const client = clients.filter((client: Client) => client.phone === number);
+      if (client.length > 0) {
+        setShipper((prev)=>({...prev, ...client[0]}));
+      }
+    }
+  }
+
+  function loadShipperPhone(e: any) {
+    setShipper((prev)=>({ ...prev, phone: e.target.value }));
+    searchClient(e.target.value);
   }
 
   return (
     <>
+      {order && (
+        <>
+          <div>
+            <button onClick={() => navigate("/list")} className="border border-black rounded-lg p-1 bg-white">
+              <ArrowLeft />
+            </button>
+          </div>
+          <br />
+        </>
+      )}
       <div className="space-y-2">
         <div className="p-4 bg-white border-l-8 rounded-lg border-primary shadow-xl space-y-2">
           <div>
@@ -308,7 +342,7 @@ export default function Add() {
                     );
                   })}
                 </select>
-                <input disabled={shipper.id !== undefined} type="number" value={shipper.phone} onChange={(e: any) => setShipper({ ...shipper, phone: e.target.value })} className="w-full focus:outline-none px-2 group-focus:border-black" />
+                <input disabled={shipper.id !== undefined} type="number" value={shipper.phone} onChange={loadShipperPhone} className="w-full focus:outline-none px-2 group-focus:border-black" />
               </div>
               <div className="bg-green-600 aspect-square h-10 flex justify-center items-center rounded">
                 <a href={`https://api.whatsapp.com/send?phone=${shipper?.phoneCode?.slice(1)}${shipper?.phone}`} target="_blank">
@@ -337,19 +371,6 @@ export default function Add() {
           <div>
             <label className="text-sm text-gray-900">{t("add.cin")}</label>
             <Input value={recipient.recipientCin} onChange={(e: any) => setRecipient({ ...recipient, recipientCin: e.target.value.toUpperCase() })} />
-          </div>
-          <div>
-            <label className="text-sm text-gray-900">{t("add.home_delivery")}</label>
-            <div className="flex justify-evenly my-4">
-              <div className="space-x-2">
-                <input type="radio" name="home_delivery" id="home_delivery_no" checked={!recipient.homeDelivery} onChange={() => setRecipient({ ...recipient, homeDelivery: false })} />
-                <label htmlFor="home_delivery_no">{t("common.no")}</label>
-              </div>
-              <div className="space-x-2">
-                <input type="radio" name="home_delivery" id="home_delivery_yes" checked={recipient.homeDelivery} onChange={() => setRecipient({ ...recipient, homeDelivery: true })} />
-                <label htmlFor="home_delivery_yes">{t("common.yes")}</label>
-              </div>
-            </div>
           </div>
           <div>
             <label className="text-sm text-gray-900">{t("add.city")}</label>
@@ -403,6 +424,19 @@ export default function Add() {
           <div>
             <label className="text-sm text-gray-900">{t("add.parcel_number")}</label>
             <Input value={parcel.parcelNumber} onChange={(e: any) => setParcel({ ...parcel, parcelNumber: e.target.value })} />
+          </div>
+          <div>
+            <label className="text-sm text-gray-900">{t("add.home_delivery")}</label>
+            <div className="flex justify-evenly my-4">
+              <div className="space-x-2">
+                <input type="radio" name="home_delivery" id="home_delivery_no" checked={!parcel.homeDelivery} onChange={() => setParcel({ ...parcel, homeDelivery: false })} />
+                <label htmlFor="home_delivery_no">{t("common.no")}</label>
+              </div>
+              <div className="space-x-2">
+                <input type="radio" name="home_delivery" id="home_delivery_yes" checked={parcel.homeDelivery} onChange={() => setParcel({ ...parcel, homeDelivery: true })} />
+                <label htmlFor="home_delivery_yes">{t("common.yes")}</label>
+              </div>
+            </div>
           </div>
           <div>
             <label className="text-sm text-gray-900">{t("add.parcel.paid")}</label>
@@ -472,7 +506,7 @@ export default function Add() {
           </div>
         </div>
       )}
-      <ClientsModal open={openClientsModal} setOpen={setOpenClientsModal} setShipper={setShipper} country={country} />
+      {openClientsModal && <ClientsModal open={openClientsModal} setOpen={setOpenClientsModal} setShipper={setShipper} country={country} clients={clients} />}
     </>
   );
 }
@@ -482,17 +516,17 @@ type props = {
   setOpen: (open: boolean) => void;
   setShipper: (shipper: Shipper) => void;
   country: "Morocco" | "France";
+  clients: Client[];
 };
 
-function ClientsModal({ open, setOpen, setShipper, country }: props) {
+function ClientsModal({ open, setOpen, setShipper, country, clients }: props) {
   const [openDelete, setOpenDelete] = useState<boolean>(false);
-  const [clients, setClients] = useState<Client[]>([]);
   const [filtered, setFiltered] = useState<Client[]>([]);
   const [search, setSearch] = useState<string>("");
   const { t } = useTranslation();
 
   useEffect(() => {
-    fetchClients(country);
+    setFiltered(clients);
   }, [country]);
 
   useEffect(() => {
@@ -502,12 +536,6 @@ function ClientsModal({ open, setOpen, setShipper, country }: props) {
   useEffect(() => {
     setFiltered(clients.filter((client: Client) => client.name.toLowerCase().includes(search.toLowerCase())));
   }, [search]);
-
-  async function fetchClients(country: string) {
-    const res = await api.get("/clients/country/" + country);
-    setClients(res.data);
-    setFiltered(res.data);
-  }
 
   function closeModal() {
     setOpenDelete(false);

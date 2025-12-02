@@ -71,13 +71,15 @@ CREATE TABLE `Client` (
   `cin` varchar(191) NOT NULL,
   `phone` varchar(191) NOT NULL,
   `phoneCode` varchar(191) NOT NULL,
-  `address` varchar(191) NOT NULL,
+  `address` varchar(191) DEFAULT NULL,
   `cityId` int(11) NOT NULL,
   `country` enum('Morocco','France') NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `Client_cin_key` (`cin`),
+  UNIQUE KEY `Client_phoneCode_phone_key` (`phoneCode`,`phone`),
   KEY `Client_cityId_fkey` (`cityId`),
   CONSTRAINT `Client_cityId_fkey` FOREIGN KEY (`cityId`) REFERENCES `City` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,8 +90,7 @@ LOCK TABLES `Client` WRITE;
 /*!40000 ALTER TABLE `Client` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `Client` VALUES
-(1,'mohammed','CD369258','691926735','+212','132 addr',3,'Morocco'),
-(2,'mohammed','CD3216541','685741424','+212','asd654465',3,'Morocco');
+(1,'mohammed','CD369258','691926735','+212','132 addr',3,'Morocco');
 /*!40000 ALTER TABLE `Client` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -118,15 +119,15 @@ CREATE TABLE `Order` (
   `nParcels` int(11) NOT NULL,
   `productType` varchar(191) NOT NULL,
   `weight` double NOT NULL,
-  `status` enum('origin','inTransit','inStock','delivered','notDelivered') NOT NULL DEFAULT 'origin',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Order_parcelCode_key` (`parcelCode`),
+  UNIQUE KEY `Order_recipientCin_key` (`recipientCin`),
   KEY `Order_parcelCode_idx` (`parcelCode`),
   KEY `Order_shipperId_fkey` (`shipperId`),
   KEY `Order_recipientCityId_fkey` (`recipientCityId`),
   CONSTRAINT `Order_recipientCityId_fkey` FOREIGN KEY (`recipientCityId`) REFERENCES `City` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `Order_shipperId_fkey` FOREIGN KEY (`shipperId`) REFERENCES `Client` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,7 +138,9 @@ LOCK TABLES `Order` WRITE;
 /*!40000 ALTER TABLE `Order` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `Order` VALUES
-(4,'3214','RUzgpK3toy',1,'hamada','ASD1321',1,11,'685474451','+33','2025-11-26 13:26:03.377',1,2000,12,'snidi9at',200,'inTransit');
+(4,'3214','RUzgpK3toy',1,'hamada','ASD1321',1,11,'685474451','+33','2025-11-26 13:26:03.377',1,2000,12,'snidi9at',200),
+(5,'52465','QVQtReFXpL',1,'yesyt','TASET',1,12,'254147853','+33','2025-12-01 15:01:55.851',0,32,11,'wa3',321),
+(6,'25','SbYPkZ3Ksx',1,'test','TEST',1,12,'145258748','+33','2025-12-01 15:09:06.743',0,220,2,'wa2',2120);
 /*!40000 ALTER TABLE `Order` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -156,7 +159,7 @@ CREATE TABLE `Pic` (
   PRIMARY KEY (`id`),
   KEY `Pic_orderId_fkey` (`orderId`),
   CONSTRAINT `Pic_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,8 +171,53 @@ LOCK TABLES `Pic` WRITE;
 set autocommit=0;
 INSERT INTO `Pic` VALUES
 (64,'/uploads/images-1764163563429-652716264.jpg',4),
-(65,'/uploads/images-1764163563447-112464453.jpg',4);
+(65,'/uploads/images-1764163563447-112464453.jpg',4),
+(66,'/uploads/images-1764601315897-317885027.jpeg',5),
+(67,'/uploads/images-1764601315886-622624052.jpeg',5),
+(68,'/uploads/images-1764601746768-523784036.jpeg',6);
 /*!40000 ALTER TABLE `Pic` ENABLE KEYS */;
+UNLOCK TABLES;
+commit;
+
+--
+-- Table structure for table `Status`
+--
+
+DROP TABLE IF EXISTS `Status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orderId` int(11) NOT NULL,
+  `name` enum('origin','inTransit','inStock','delivered','notDelivered') NOT NULL,
+  `date` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  PRIMARY KEY (`id`),
+  KEY `Status_orderId_fkey` (`orderId`),
+  CONSTRAINT `Status_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Status`
+--
+
+LOCK TABLES `Status` WRITE;
+/*!40000 ALTER TABLE `Status` DISABLE KEYS */;
+set autocommit=0;
+INSERT INTO `Status` VALUES
+(1,4,'origin','2025-11-12 00:00:00.000'),
+(2,4,'inTransit','2025-12-01 11:30:21.182'),
+(3,4,'delivered','2025-12-01 14:47:29.384'),
+(5,4,'notDelivered','2025-12-01 14:51:33.030'),
+(6,4,'inStock','2025-12-01 14:51:37.894'),
+(10,4,'inTransit','2025-12-01 14:54:49.373'),
+(11,5,'origin','2025-12-01 15:01:55.860'),
+(12,6,'origin','2025-12-01 15:09:06.748'),
+(13,6,'inStock','2025-12-01 15:09:23.850'),
+(14,6,'inTransit','2025-12-01 15:09:28.881'),
+(15,6,'delivered','2025-12-01 15:09:30.811'),
+(16,6,'notDelivered','2025-12-01 15:09:32.607');
+/*!40000 ALTER TABLE `Status` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
 
@@ -231,8 +279,11 @@ LOCK TABLES `_prisma_migrations` WRITE;
 /*!40000 ALTER TABLE `_prisma_migrations` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `_prisma_migrations` VALUES
+('1d7f28be-ef0e-4526-b393-fdd50edf58ea','23de972af584f4a431da5d3e9ca99cda965115fe015c3a25a42139029f2ad0c0','2025-12-01 10:15:03.905','20251201101503_dev',NULL,NULL,'2025-12-01 10:15:03.807',1),
 ('55836477-70e5-454c-be2e-aa4c556c38bb','93509edeb61800d867ebd4b2ac3ab558e60cb680aa1ca5f2bdd255d1100ad296','2025-11-22 11:03:58.306','20251122110358_dev',NULL,NULL,'2025-11-22 11:03:58.154',1),
-('e3e08747-53a0-4fb1-a26a-98d3f9a82a70','4bb626276b5437eee27852ce7a10c94566fe212ad79a533ef64f1b4208efa1d4','2025-11-24 15:44:32.186','20251124154432_dev',NULL,NULL,'2025-11-24 15:44:32.168',1);
+('91742802-9376-46df-8e5a-9a18d9089ac1','5188dd8c5f94920c25cdbcd2450beae68034c6269f9e9bb692430acde7db4d13','2025-12-01 14:54:34.575','20251201145434_dev',NULL,NULL,'2025-12-01 14:54:34.559',1),
+('e3e08747-53a0-4fb1-a26a-98d3f9a82a70','4bb626276b5437eee27852ce7a10c94566fe212ad79a533ef64f1b4208efa1d4','2025-11-24 15:44:32.186','20251124154432_dev',NULL,NULL,'2025-11-24 15:44:32.168',1),
+('e7b810ac-9d34-42c5-b24e-827a3bdd0d51','56dac39aef22f5f118d5f4715f4f2ee8a55762bf136771b5a736feb30489fd6a','2025-11-28 09:49:28.040','20251128094927_dev',NULL,NULL,'2025-11-28 09:49:27.995',1);
 /*!40000 ALTER TABLE `_prisma_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -246,4 +297,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-11-27 10:45:07
+-- Dump completed on 2025-12-02 10:30:37

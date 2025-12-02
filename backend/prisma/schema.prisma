@@ -23,42 +23,49 @@ model User {
 model Client {
   id        Int     @id @default(autoincrement())
   name      String
-  cin       String
+  cin       String  @unique
   phone     String
   phoneCode String
-  address   String
+  address   String?
   city      City    @relation(fields: [cityId], references: [id])
   cityId    Int
   country   Country
   orders    Order[]
+
+  @@unique([phoneCode, phone])
 }
 
 model Order {
-  id Int @id @default(autoincrement())
-
-  parcelNumber String
-  parcelCode   String @unique
-  shipperId    Int
-  shipper      Client @relation(fields: [shipperId], references: [id])
-
+  id                 Int      @id @default(autoincrement())
+  parcelNumber       String
+  parcelCode         String   @unique
   recipientName      String
-  recipientCin       String
-  homeDelivery       Boolean
+  recipientCin       String   @unique
   recipientCityId    Int
-  recipientCity      City    @relation(fields: [recipientCityId], references: [id])
+  recipientCity      City     @relation(fields: [recipientCityId], references: [id])
   recipientPhone     String
   recipientPhoneCode String
-
-  date        DateTime @default(now())
-  paid        Boolean
-  paidAmount  Float
-  nParcels    Int
-  pics        Pic[]
-  productType String
-  weight      Float
-  status      Status   @default(origin)
+  homeDelivery       Boolean
+  date               DateTime @default(now())
+  paid               Boolean
+  paidAmount         Float
+  nParcels           Int
+  pics               Pic[]
+  productType        String
+  weight             Float
+  statuses           Status[]
+  shipperId          Int
+  shipper            Client   @relation(fields: [shipperId], references: [id])
 
   @@index([parcelCode])
+}
+
+model Status {
+  id      Int        @id @default(autoincrement())
+  orderId Int
+  order   Order      @relation(fields: [orderId], references: [id])
+  name    StatusEnum 
+  date    DateTime   @default(now())
 }
 
 model Pic {
@@ -81,7 +88,7 @@ enum Country {
   France
 }
 
-enum Status {
+enum StatusEnum {
   origin
   inTransit
   inStock

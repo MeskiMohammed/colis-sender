@@ -1,0 +1,20 @@
+{
+  "parcel_code": "رمز الطرد",
+  "french": "الفرنسية",
+  "arabe": "العربية",
+  "title": "الحصول على معلومات حول طردك",
+  "search": "بحث",
+  "origin": "المصدر",
+  "inStock": "متوفر",
+  "inTransit": "قيد النقل",
+  "delivered": "تم التسليم",
+  "notDelivered": "لم يتم التسليم",
+  "code_error": "رمز غير صالح",
+  "yes": "نعم",
+  "no": "لا",
+  "weight": "الوزن",
+  "product_type": "نوع المنتج",
+  "parcels_number": "عدد الطرود",
+  "paid": "مدفوع",
+  "status": "الحالة"
+}

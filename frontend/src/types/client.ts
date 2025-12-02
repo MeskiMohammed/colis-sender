@@ -10,4 +10,7 @@ export default interface Client {
   address: string;
   cin: string;
   country: "Morocco" | "France";
+  _count: {
+    orders: number;
+  };
 }

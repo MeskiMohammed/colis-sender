@@ -27,6 +27,7 @@
   "common": {
     "french": "Français",
     "arabic": "Arabe",
+    "reload": "Recharger",
     "no_internet": "Pas de connexion Internet",
     "change_language": "Changer de langue",
     "shipper": "Exp.",

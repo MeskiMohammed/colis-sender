@@ -1,27 +1,10 @@
-import type { Parcel, Recipient, Shipper } from "@/pages/add";
-import type City from "@/types/city";
+import type { StrippedOrder, Order } from "@/pages/list";
 import jsPDF from "jspdf";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { FileOpener } from "@capacitor-community/file-opener";
 import autoTable from "jspdf-autotable";
 
-type StrippedOrder = {
-  id: number;
-  parcelCode: string;
-  recipientName: string;
-  recipientCity: { id: number; name: string };
-  recipientPhoneCode: string;
-  recipientPhone: string;
-  shipper: { name: string; phone: string; phoneCode: string; city: { name: string } };
-  status: string;
-  productType: string;
-  parcelNumber: string;
-  date: string;
-  nParcels: number;
-  paid: boolean;
-};
 
-type Order = Recipient & Parcel & { id: number; pics: { url: string }[]; shipper: Shipper & { city: City }; recipientCity: City; status: string; parcelCode: string };
 
 type OrdersByCity = {
   city: string;

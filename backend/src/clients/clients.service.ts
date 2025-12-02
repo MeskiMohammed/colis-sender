@@ -11,14 +11,19 @@ export class ClientsService {
   async findAll(country: Country) {
     return this.prisma.client.findMany({
       select: {
-				id: true,
+        id: true,
         name: true,
         cin: true,
         phoneCode: true,
         phone: true,
         address: true,
-        cityId:true,
+        cityId: true,
         city: { select: { name: true } },
+        _count: {
+          select: {
+            orders:true
+          },
+        },
       },
       where: { country },
       orderBy: { name: 'asc' },
@@ -33,7 +38,11 @@ export class ClientsService {
   }
 
   async create(data: CreateClientDto) {
-    return this.prisma.client.create({ data });
+    return this.prisma.client.upsert({
+      where: { cin: data.cin },
+      create: data,
+      update: {},
+    });
   }
 
   async update(id: number, data: UpdateClientDto) {

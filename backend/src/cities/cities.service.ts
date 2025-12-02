@@ -7,13 +7,18 @@ import { CreateCityDto } from './dto/create-city.dto';
 export class CitiesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.city.findMany({orderBy: {name: 'asc'}});
-  }
-
   async findByCountry(country: Country) {
     return this.prisma.city.findMany({
       where: { country },
+      select: {
+        id: true,
+        name: true,
+        _count: {
+          select: {
+            clients: true,
+          },
+        },
+      },
     });
   }
 

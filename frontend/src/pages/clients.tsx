@@ -56,17 +56,24 @@ export default function Clients() {
   }
 
   async function deleteClient() {
-    if(loading)return
-    setLoading(true)
-    await toast.promise(api.delete("/clients/" + client.id), {
-      loading: t("common.deleting"),
-      success: ()=>{
-        fetchClients(country);
-        closeModal();
-        return t("common.deleted")},
-      error: t("common.delete_error"),
-    });
-    setLoading(false)
+    if (loading) return;
+    setLoading(true);
+    try {
+      await toast.promise(
+        api.delete("/clients/" + client.id),
+        {
+          loading: t("common.deleting"),
+          success: t("common.deleted"),
+          error: (err) => t("common.delete_error") + " " + err.message,
+        },
+        { id: "delete" }
+      );
+      fetchClients(country);
+      closeModal();
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   }
 
   function closeModal() {
@@ -110,7 +117,7 @@ export default function Clients() {
               <Button onClick={() => handleEdit(client)} className="bg-orange-600 rounded-none rounded-tr-xl rtl:rounded-tr-none rtl:rounded-tl-xl">
                 <Pen />
               </Button>
-              <Button onClick={() => handleDelete(client.id)} className="bg-red-600 rounded-none rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl">
+              <Button disabled={client._count.orders > 0} onClick={() => handleDelete(client.id)} className="bg-red-600 rounded-none rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl">
                 <Trash2 />
               </Button>
             </div>
@@ -141,7 +148,7 @@ function Modal({ editing, client, setClient, cities, open, close, fetchClients }
   const { country } = useCountry();
 
   async function save() {
-    if(loading)return
+    if (loading) return;
     setLoading(true);
     if (editing) {
       if (!client.id) {

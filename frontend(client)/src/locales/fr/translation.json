@@ -1,0 +1,20 @@
+{
+  "parcel_code": "Code de Colis",
+  "french": "Français",
+  "arabe": "Arabe",
+  "title": "Obtenir des informations sur votre colis",
+  "search": "Rechercher",
+  "origin": "Origine",
+  "inStock": "En Stock",
+  "inTransit": "En Transit",
+  "delivered": "Livré",
+  "notDelivered": "Non Livré",
+  "code_error": "Code invalide",
+  "yes": "Oui",
+  "no": "Non",
+  "weight": "Poids",
+  "product_type": "Type de produit",
+  "parcels_number": "Nombre des colis",
+  "paid": "Payé",
+  "status": "Statut"
+}

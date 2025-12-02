@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { printList, printElement } from "@/lib/pdf";
 import { useTranslation } from "react-i18next";
 
-type StrippedOrder = {
+export type StrippedOrder = {
   id: number;
   parcelCode: string;
   recipientName: string;
@@ -21,7 +21,7 @@ type StrippedOrder = {
   recipientPhoneCode: string;
   recipientPhone: string;
   shipper: { name: string; phone: string; phoneCode: string; city: { name: string } };
-  status: string;
+  statuses: { name: string }[];
   productType: string;
   parcelNumber: string;
   date: string;
@@ -29,7 +29,16 @@ type StrippedOrder = {
   paid: boolean;
 };
 
-type Order = Recipient & Parcel & { id: number; pics: { url: string }[]; shipper: Shipper & { city: City }; recipientCity: City; status: string; parcelCode: string };
+export type Order = Recipient & Parcel & { id: number; pics: { url: string }[]; shipper: Shipper & { city: City }; recipientCity: City; statuses: { name: string }[]; parcelCode: string };
+
+const statusColors: Record<string, string> = {
+  origin: "bg-gray-400",
+  inStock: "bg-orange-400",
+  inTransit: "bg-yellow-400",
+  delivered: "bg-green-400",
+  notDelivered: "bg-red-400",
+  unknown: "bg-gray-400",
+};
 
 export default function List() {
   const [search, setSearch] = useState<{ str: string; date: string; cityId: string }>({ str: "", date: "", cityId: "" });
@@ -153,7 +162,6 @@ export default function List() {
               {search.date ? new Date(search.date).toLocaleDateString("fr-FR") : "dd/mm/yyyy"}
             </label>
           </div>
-          {/* <input type="date" className="text-center w-full border border-black rounded-full" onChange={(e: any) => setSearch({ ...search, date: e.target.value })} value={search.date} /> */}
         </div>
         <Button disabled={!filtered.length} onClick={() => printList(filtered)} className="flex items-center gap-2 justify-center w-full rounded-full py-3">
           <Printer />
@@ -194,8 +202,8 @@ export default function List() {
               <Button className="rounded-none px-0 col-span-3 rounded-bl-xl rtl:rounded-bl-none rtl:rounded-br-xl flex gap-1 justify-center items-center" onClick={() => handleShowDetails(order.id)}>
                 {t("list.details")}
               </Button>
-              <Button onClick={() => handleShowStatusModal(order.id, order.status)} className="rounded-none col-span-6 flex gap-1 justify-center items-center bg-orange-600">
-                <p>{t("list." + order?.status || "list.unknown")}</p>
+              <Button onClick={() => handleShowStatusModal(order.id, order?.statuses[0].name)} className={clsx("rounded-none col-span-6 flex gap-1 justify-center items-center !text-black", statusColors[order?.statuses[0].name])}>
+                <p>{t("list." + order.statuses[0].name || "list.unknown")}</p>
                 <PackageSearch />
               </Button>
               <Button className="rounded-none col-span-3 bg-green-600 rounded-br-xl rtl:rounded-br-none rtl:rounded-bl-xl flex gap-1 justify-center items-center">
@@ -248,15 +256,6 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
     setTimeout(close, 300);
   }
 
-  const statusColors: Record<string, string> = {
-    origin: "bg-gray-400",
-    inStock: "bg-orange-400",
-    inTransit: "bg-yellow-400",
-    delivered: "bg-green-400",
-    notDelivered: "bg-red-400",
-    unknown: "bg-gray-400",
-  };
-
   return (
     <>
       {open && (
@@ -270,7 +269,7 @@ function OrderDetailsModal({ open, close, orderId }: Props) {
                 <div className="bg-purple-900 text-white px-2 py-1 rounded">{order?.parcelCode}</div>
               </div>
               <div className="w-full flex justify-end">
-                <div className={clsx("text-xs py-1 px-2 rounded-full", statusColors[order?.status || "unknown"])}>{t("list." + order?.status || "list.unknown")}</div>
+                <div className={clsx("text-xs py-1 px-2 rounded-full", statusColors[order?.statuses[0].name || "unknown"])}>{t("list." + order?.statuses[0].name || "list.unknown")}</div>
               </div>
             </div>
             <div className="overflow-y-auto ">

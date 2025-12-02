@@ -9,11 +9,6 @@ import { AuthGuard } from '../auth/auth.guard';
 export class CitiesController {
     constructor(private readonly citiesService: CitiesService) {}
 
-    @Get()
-    findAll() {
-        return this.citiesService.findAll();
-    }
-
     @Get(':country')
     findByCountry(@Param('country') country: Country) {
         return this.citiesService.findByCountry(country);

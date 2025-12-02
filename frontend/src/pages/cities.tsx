@@ -93,7 +93,7 @@ export default function Cities() {
           {cities.map((city: City) => (
             <li key={city.id} className="flex border border-black rounded-xl justify-between items-center">
               <span className="mx-2">{city.name}</span>
-              <Button className="bg-red-600 aspect-square rounded-xl" onClick={() => handleDelete(city.id)}>
+              <Button disabled={city._count.clients>0} className="bg-red-600 aspect-square rounded-xl" onClick={() => handleDelete(city.id)}>
                 <Trash2 />
               </Button>
             </li>

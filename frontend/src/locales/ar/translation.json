@@ -27,6 +27,7 @@
   "common": {
     "french": "الفرنسية",
     "arabic": "العربية",
+    "reload": "إعادة التحميل",
     "no_internet": "لا يوجد اتصال بالإنترنت",
     "change_language": "تغيير اللغة",
     "shipper": "(المرسل)",

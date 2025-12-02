@@ -3,6 +3,7 @@ import { Frown, Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
+import Button from "@/components/ui/button";
 
 export default function Check() {
   const [internet, setInternet] = useState<boolean>(true);
@@ -37,6 +38,7 @@ function NoInternet() {
     <div className="absolute inset-0 flex justify-center items-center flex-col bg-gray-700 text-white">
       <Frown size={200} />
       <p className="text-4xl font-semibold text-center">{t("common.no_internet")}</p>
+      <Button onClick={() => window.location.reload()}>{t("common.reload")}</Button>
     </div>
   );
 }
@@ -44,7 +46,7 @@ function NoInternet() {
 function Loading() {
   return (
     <div className="absolute inset-0 flex justify-around bg-background items-center flex-col">
-      <img src="/logo-white.png" alt="logo" className="w-2/3 bg-primary p-8 rounded-xl" />
+      <img src="/logo.png" alt="logo" className="w-2/3 p-8 rounded-xl" />
       <Loader size={50} className="animate-spin" />
     </div>
   );
